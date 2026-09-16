@@ -1,11 +1,9 @@
 from pathlib import Path
 from typing import Dict, List
 
-import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-
 from transformers import PreTrainedTokenizerBase
 
 from .features import extract_linguistic_features
@@ -16,18 +14,16 @@ class PropagationDataset(Dataset):
     """
     Dataset for fake-news detection using:
 
-        source tweet text
-        linguistic features
-        propagation tree structure
-        propagation delays
+    - source tweet text
+    - linguistic features
+    - propagation tree structure
+    - propagation delays
 
     Expected dataframe columns:
 
-        id
-        text
-        label
-
-    Each propagation tree is loaded using the source tweet ID.
+    - id
+    - text
+    - label
     """
 
     def __init__(
@@ -37,28 +33,20 @@ class PropagationDataset(Dataset):
         tokenizer: PreTrainedTokenizerBase,
         max_length: int = 256,
     ):
-        self.dataframe = dataframe.reset_index(drop=True)
+        self.df = dataframe.reset_index(drop=True)
         self.tree_dir = Path(tree_dir)
         self.tokenizer = tokenizer
         self.max_length = max_length
 
-    def __len__(self) -> int:
-        return len(self.dataframe)
+    def __len__(self):
+        return len(self.df)
 
-    def __getitem__(self, idx: int) -> Dict:
-        row = self.dataframe.iloc[idx]
+    def __getitem__(self, index):
+        row = self.df.iloc[index]
 
-        # -------------------------------------------------
-        # Source tweet
-        # -------------------------------------------------
-
-        tweet_id = str(row["id"])
         text = str(row["text"])
+        tweet_id = str(row["id"])
         label = int(row["label"])
-
-        # -------------------------------------------------
-        # Tokenize source tweet
-        # -------------------------------------------------
 
         encoded = self.tokenizer(
             text,
@@ -68,21 +56,10 @@ class PropagationDataset(Dataset):
             return_tensors="pt",
         )
 
-        input_ids = encoded["input_ids"].squeeze(0)
-        attention_mask = encoded["attention_mask"].squeeze(0)
-
-        # -------------------------------------------------
-        # Linguistic features
-        # -------------------------------------------------
-
         linguistic_features = torch.tensor(
             extract_linguistic_features(text),
             dtype=torch.float32,
         )
-
-        # -------------------------------------------------
-        # Propagation tree
-        # -------------------------------------------------
 
         tree = load_propagation_tree(
             self.tree_dir,
@@ -107,8 +84,8 @@ class PropagationDataset(Dataset):
         return {
             "id": tweet_id,
             "text": text,
-            "input_ids": input_ids,
-            "attention_mask": attention_mask,
+            "input_ids": encoded["input_ids"].squeeze(0),
+            "attention_mask": encoded["attention_mask"].squeeze(0),
             "linguistic_features": linguistic_features,
             "node_features": node_features,
             "edge_index": edge_index,
@@ -117,16 +94,14 @@ class PropagationDataset(Dataset):
         }
 
 
-def propagation_collate_fn(batch: List[Dict]) -> Dict:
+def propagation_collate(batch: List[Dict]) -> Dict:
     """
-    Collate function for variable-size propagation trees.
+    Collate function for variable-size propagation graphs.
 
-    Text tensors have fixed dimensions and can be stacked.
+    Text and linguistic tensors are stacked.
 
-    Graph tensors cannot be stacked because every propagation
-    tree has a different number of nodes and edges.
-
-    Therefore graph-related fields remain Python lists.
+    Graph tensors remain lists because every propagation
+    tree contains a different number of nodes and edges.
     """
 
     return {
@@ -161,3 +136,8 @@ def propagation_collate_fn(batch: List[Dict]) -> Dict:
             [item["label"] for item in batch]
         ),
     }
+
+
+# Backwards-compatible alias.
+# Some code may use the _fn name.
+propagation_collate_fn = propagation_collate
