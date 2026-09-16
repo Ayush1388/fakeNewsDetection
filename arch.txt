@@ -1,0 +1,18 @@
+TEG-FND v1.0 (FINAL CODE CONTRACT)
+
+Available data: source tweet/claim text + labels. Twitter15/Twitter16 supplied files do not contain propagation edges/timestamps, so no graph values are fabricated.
+
+Pipeline:
+source text -> DeBERTa-v3 -> attention pooling -> semantic projection
+                                      \
+                                       cross-view attention -> adaptive MoE -> veracity + uncertainty
+                                      /
+                 deterministic text-structure auxiliary view
+
+Tasks:
+Twitter15/16: 4-class (non-rumor, true, false, unverified)
+PolitiFact: 6-class (pants-fire, false, mostly-false, half-true, mostly-true, true)
+
+Split: stratified 70/15/15. Model selection uses validation Macro-F1 only. Final test is evaluated after checkpoint selection.
+
+A real propagation graph can later be attached behind graph_utils.py without changing the data/model/training interfaces, but it is not part of reported results until actual edge/timestamp data is supplied.

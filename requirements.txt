@@ -1,0 +1,16 @@
+torch>=2.2,<3.0
+transformers>=4.45,<5.0
+sentencepiece>=0.2
+accelerate>=0.34
+
+numpy>=1.26,<3.0
+pandas>=2.0,<3.0
+scikit-learn>=1.4,<2.0
+scipy>=1.11,<2.0
+
+PyYAML>=6.0
+tqdm>=4.66
+lime>=0.2.0.1
+networkx>=3.2
+
+matplotlib>=3.8

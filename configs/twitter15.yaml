@@ -1,0 +1,9 @@
+dataset: twitter15
+num_classes: 4
+labels: [non-rumor, true, false, unverified]
+model_name: microsoft/deberta-v3-base
+max_len: 192
+batch_size: 8
+learning_rate: 1.0e-5
+epochs: 5
+seed: 42
