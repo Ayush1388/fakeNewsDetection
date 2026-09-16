@@ -1,9 +1,7 @@
 from pathlib import Path
 
-import numpy as np
 import torch
 from tqdm import tqdm
-
 from sklearn.metrics import f1_score
 
 
@@ -17,6 +15,7 @@ class Trainer:
         device,
         save_path,
     ):
+
         self.model = model
         self.optimizer = optimizer
         self.criterion = criterion
@@ -75,9 +74,7 @@ class Trainer:
                     set_to_none=True
                 )
 
-            with torch.set_grad_enabled(
-                training
-            ):
+            with torch.set_grad_enabled(training):
 
                 output = self.model(
                     input_ids=input_ids,
@@ -91,6 +88,7 @@ class Trainer:
                 )
 
                 if training:
+
                     loss.backward()
 
                     torch.nn.utils.clip_grad_norm_(
@@ -107,15 +105,11 @@ class Trainer:
             )
 
             predictions.extend(
-                pred.detach()
-                .cpu()
-                .numpy()
+                pred.detach().cpu().numpy()
             )
 
             labels.extend(
-                target.detach()
-                .cpu()
-                .numpy()
+                target.detach().cpu().numpy()
             )
 
         macro_f1 = f1_score(
@@ -139,7 +133,10 @@ class Trainer:
 
         history = []
 
-        for epoch in range(1, epochs + 1):
+        for epoch in range(
+            1,
+            epochs + 1,
+        ):
 
             train_metrics = self._run_epoch(
                 train_loader,
@@ -151,19 +148,17 @@ class Trainer:
                 training=False,
             )
 
-            row = {
-                "epoch": epoch,
-                "train_loss": train_metrics["loss"],
-                "train_f1": train_metrics["macro_f1"],
-                "val_loss": val_metrics["loss"],
-                "val_f1": val_metrics["macro_f1"],
-            }
-
-            history.append(row)
-
-            print(
-                f"\nEpoch {epoch}/{epochs}"
+            history.append(
+                {
+                    "epoch": epoch,
+                    "train_loss": train_metrics["loss"],
+                    "train_f1": train_metrics["macro_f1"],
+                    "val_loss": val_metrics["loss"],
+                    "val_f1": val_metrics["macro_f1"],
+                }
             )
+
+            print(f"\nEpoch {epoch}/{epochs}")
 
             print(
                 f"Train Loss: {train_metrics['loss']:.4f} | "
@@ -177,19 +172,14 @@ class Trainer:
 
             if val_metrics["macro_f1"] > self.best_f1:
 
-                self.best_f1 = (
-                    val_metrics["macro_f1"]
-                )
+                self.best_f1 = val_metrics["macro_f1"]
 
                 torch.save(
                     {
-                        "model_state_dict":
-                            self.model.state_dict(),
-                        "optimizer_state_dict":
-                            self.optimizer.state_dict(),
+                        "model_state_dict": self.model.state_dict(),
+                        "optimizer_state_dict": self.optimizer.state_dict(),
                         "epoch": epoch,
-                        "val_f1":
-                            self.best_f1,
+                        "val_f1": self.best_f1,
                     },
                     self.save_path,
                 )

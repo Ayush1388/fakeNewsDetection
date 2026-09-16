@@ -1,20 +1,29 @@
-import argparse
+import sys
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+import argparse
+import random
+
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer
 from sklearn.model_selection import train_test_split
-from sklearn.utils.class_weight import compute_class_weight
 
 from src.data.loaders import load_dataset
 from src.data.dataset import FakeNewsDataset
-
 from src.models.tegfnd import TEGFND
-
-from src.training.seed import set_seed
+from src.models.deberta_baseline import DeBERTaBaseline
 from src.training.losses import WeightedCrossEntropy
 from src.training.trainer import Trainer
+
+
+TRANSFORMER_NAME = "microsoft/deberta-v3-base"
 
 
 DATASETS = {
@@ -50,6 +59,56 @@ DATASETS = {
 }
 
 
+def seed_everything(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
+def build_splits(df, seed):
+
+    train_df, temp_df = train_test_split(
+        df,
+        test_size=0.30,
+        random_state=seed,
+        stratify=df["label"],
+    )
+
+    val_df, test_df = train_test_split(
+        temp_df,
+        test_size=0.50,
+        random_state=seed,
+        stratify=temp_df["label"],
+    )
+
+    return (
+        train_df.reset_index(drop=True),
+        val_df.reset_index(drop=True),
+        test_df.reset_index(drop=True),
+    )
+
+
+def build_model(
+    model_type,
+    num_classes,
+):
+
+    if model_type == "deberta":
+
+        return DeBERTaBaseline(
+            num_classes=num_classes,
+            model_name=TRANSFORMER_NAME,
+        )
+
+    return TEGFND(
+        num_classes=num_classes,
+        model_name=TRANSFORMER_NAME,
+    )
+
+
 def main():
 
     parser = argparse.ArgumentParser()
@@ -62,7 +121,11 @@ def main():
 
     parser.add_argument(
         "--model",
-        default="microsoft/deberta-v3-base",
+        default="tegfnd",
+        choices=[
+            "tegfnd",
+            "deberta",
+        ],
     )
 
     parser.add_argument(
@@ -86,7 +149,7 @@ def main():
     parser.add_argument(
         "--max-length",
         type=int,
-        default=192,
+        default=256,
     )
 
     parser.add_argument(
@@ -97,7 +160,7 @@ def main():
 
     args = parser.parse_args()
 
-    set_seed(args.seed)
+    seed_everything(args.seed)
 
     device = torch.device(
         "cuda"
@@ -105,108 +168,83 @@ def main():
         else "cpu"
     )
 
-    print(
-        f"\nDevice: {device}"
-    )
+    print(f"Device: {device}")
+    print(f"Dataset: {args.dataset}")
+    print(f"Model: {args.model}")
 
-    dataset_config = DATASETS[
+    config = DATASETS[
         args.dataset
     ]
 
+    dataset_path = (
+        PROJECT_ROOT
+        / config["path"]
+    )
+
     df = load_dataset(
         args.dataset,
-        dataset_config["path"],
+        dataset_path,
     )
 
     print(
         f"Loaded {len(df)} samples."
     )
 
-    train_df, temp_df = train_test_split(
+    train_df, val_df, test_df = build_splits(
         df,
-        test_size=0.30,
-        random_state=args.seed,
-        stratify=df["label"],
-    )
-
-    val_df, test_df = train_test_split(
-        temp_df,
-        test_size=0.50,
-        random_state=args.seed,
-        stratify=temp_df["label"],
+        args.seed,
     )
 
     print(
-        f"Train: {len(train_df)}"
+        f"Train samples: {len(train_df)}"
     )
 
     print(
-        f"Validation: {len(val_df)}"
+        f"Validation samples: {len(val_df)}"
     )
 
     print(
-        f"Test: {len(test_df)}"
+        f"Test samples: {len(test_df)}"
     )
 
     tokenizer = AutoTokenizer.from_pretrained(
-        args.model
+        TRANSFORMER_NAME
     )
 
     train_dataset = FakeNewsDataset(
         train_df,
         tokenizer,
-        args.max_length,
+        max_length=args.max_length,
     )
 
     val_dataset = FakeNewsDataset(
         val_df,
         tokenizer,
-        args.max_length,
+        max_length=args.max_length,
     )
 
     train_loader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
         shuffle=True,
-        num_workers=0,
+        num_workers=2,
+        pin_memory=torch.cuda.is_available(),
     )
 
     val_loader = DataLoader(
         val_dataset,
         batch_size=args.batch_size,
         shuffle=False,
-        num_workers=0,
+        num_workers=2,
+        pin_memory=torch.cuda.is_available(),
     )
 
-    classes = dataset_config["classes"]
-
-    class_weights = compute_class_weight(
-        class_weight="balanced",
-        classes=sorted(
-            train_df["label"].unique()
-        ),
-        y=train_df["label"],
+    model = build_model(
+        args.model,
+        len(config["classes"]),
     )
 
-    weights = torch.ones(
-        len(classes),
-        dtype=torch.float32,
-    )
-
-    for class_id, weight in zip(
-        sorted(train_df["label"].unique()),
-        class_weights,
-    ):
-        weights[class_id] = weight
-
-    weights = weights.to(device)
-
-    model = TEGFND(
-        num_classes=len(classes),
-        model_name=args.model,
-    )
-
-    model.to(device)
+    model = model.to(device)
 
     optimizer = torch.optim.AdamW(
         model.parameters(),
@@ -214,13 +252,13 @@ def main():
         weight_decay=0.01,
     )
 
-    criterion = WeightedCrossEntropy(
-        class_weights=weights
-    )
+    criterion = WeightedCrossEntropy()
 
-    checkpoint = (
-        f"results/checkpoints/"
-        f"{args.dataset}_tegfnd.pt"
+    checkpoint_path = (
+        PROJECT_ROOT
+        / "results"
+        / "checkpoints"
+        / f"{args.dataset}_{args.model}_best.pt"
     )
 
     trainer = Trainer(
@@ -228,26 +266,25 @@ def main():
         optimizer=optimizer,
         criterion=criterion,
         device=device,
-        save_path=checkpoint,
+        save_path=checkpoint_path,
     )
 
-    trainer.fit(
+    history = trainer.fit(
         train_loader=train_loader,
         validation_loader=val_loader,
         epochs=args.epochs,
     )
 
-    print(
-        "\nTraining completed."
-    )
+    print("\nTraining complete.")
 
     print(
-        f"Best validation Macro-F1: "
+        f"Best validation F1: "
         f"{trainer.best_f1:.4f}"
     )
 
     print(
-        f"Checkpoint: {checkpoint}"
+        f"Checkpoint: "
+        f"{checkpoint_path}"
     )
 
 

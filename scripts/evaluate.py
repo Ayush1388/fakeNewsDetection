@@ -1,3 +1,12 @@
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+
 import argparse
 
 import torch
@@ -7,11 +16,20 @@ from sklearn.model_selection import train_test_split
 
 from src.data.loaders import load_dataset
 from src.data.dataset import FakeNewsDataset
+
 from src.models.tegfnd import TEGFND
+from src.models.deberta_baseline import DeBERTaBaseline
+
 from src.evaluation.evaluate import evaluate_model
 
 
+TRANSFORMER_NAME = (
+    "microsoft/deberta-v3-base"
+)
+
+
 DATASETS = {
+
     "twitter15": {
         "path": "data/twitter15",
         "classes": [
@@ -21,6 +39,7 @@ DATASETS = {
             "unverified",
         ],
     },
+
     "twitter16": {
         "path": "data/twitter16",
         "classes": [
@@ -30,6 +49,7 @@ DATASETS = {
             "unverified",
         ],
     },
+
     "politifact": {
         "path": "data/politifact/politifact_factcheck_data.json",
         "classes": [
@@ -42,6 +62,48 @@ DATASETS = {
         ],
     },
 }
+
+
+def build_test_split(
+    df,
+    seed,
+):
+
+    _, temp_df = train_test_split(
+        df,
+        test_size=0.30,
+        random_state=seed,
+        stratify=df["label"],
+    )
+
+    _, test_df = train_test_split(
+        temp_df,
+        test_size=0.50,
+        random_state=seed,
+        stratify=temp_df["label"],
+    )
+
+    return test_df.reset_index(
+        drop=True
+    )
+
+
+def build_model(
+    model_type,
+    num_classes,
+):
+
+    if model_type == "deberta":
+
+        return DeBERTaBaseline(
+            num_classes=num_classes,
+            model_name=TRANSFORMER_NAME,
+        )
+
+    return TEGFND(
+        num_classes=num_classes,
+        model_name=TRANSFORMER_NAME,
+    )
 
 
 def main():
@@ -61,7 +123,11 @@ def main():
 
     parser.add_argument(
         "--model",
-        default="microsoft/deberta-v3-base",
+        default="tegfnd",
+        choices=[
+            "tegfnd",
+            "deberta",
+        ],
     )
 
     parser.add_argument(
@@ -73,7 +139,7 @@ def main():
     parser.add_argument(
         "--max-length",
         type=int,
-        default=192,
+        default=256,
     )
 
     parser.add_argument(
@@ -90,72 +156,122 @@ def main():
         else "cpu"
     )
 
+    print(
+        f"Device: {device}"
+    )
+
+    print(
+        f"Dataset: {args.dataset}"
+    )
+
+    print(
+        f"Model: {args.model}"
+    )
+
     config = DATASETS[
         args.dataset
     ]
 
+    dataset_path = (
+        PROJECT_ROOT
+        / config["path"]
+    )
+
     df = load_dataset(
         args.dataset,
-        config["path"],
+        dataset_path,
     )
 
-    _, temp_df = train_test_split(
+    print(
+        f"Loaded {len(df)} samples."
+    )
+
+    test_df = build_test_split(
         df,
-        test_size=0.30,
-        random_state=args.seed,
-        stratify=df["label"],
+        args.seed,
     )
 
-    _, test_df = train_test_split(
-        temp_df,
-        test_size=0.50,
-        random_state=args.seed,
-        stratify=temp_df["label"],
+    print(
+        f"Test samples: {len(test_df)}"
     )
 
     tokenizer = AutoTokenizer.from_pretrained(
-        args.model
+        TRANSFORMER_NAME
     )
 
     test_dataset = FakeNewsDataset(
         test_df,
         tokenizer,
-        args.max_length,
+        max_length=args.max_length,
     )
 
     test_loader = DataLoader(
         test_dataset,
         batch_size=args.batch_size,
         shuffle=False,
+        num_workers=2,
+        pin_memory=torch.cuda.is_available(),
     )
 
-    model = TEGFND(
-        num_classes=len(
-            config["classes"]
-        ),
-        model_name=args.model,
+    model = build_model(
+        args.model,
+        len(config["classes"]),
+    )
+
+    checkpoint_path = Path(
+        args.checkpoint
+    )
+
+    if not checkpoint_path.is_absolute():
+
+        checkpoint_path = (
+            PROJECT_ROOT
+            / checkpoint_path
+        )
+
+    if not checkpoint_path.exists():
+
+        raise FileNotFoundError(
+            f"Checkpoint not found: "
+            f"{checkpoint_path}"
+        )
+
+    print(
+        f"Loading checkpoint: "
+        f"{checkpoint_path}"
     )
 
     checkpoint = torch.load(
-        args.checkpoint,
+        checkpoint_path,
         map_location=device,
     )
 
     model.load_state_dict(
-        checkpoint["model_state_dict"]
+        checkpoint[
+            "model_state_dict"
+        ]
     )
 
-    model.to(device)
+    model = model.to(device)
+
+    output_dir = (
+        PROJECT_ROOT
+        / "results"
+        / "metrics"
+        / f"{args.dataset}_{args.model}"
+    )
+
+    output_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
     evaluate_model(
         model=model,
         loader=test_loader,
         device=device,
         class_names=config["classes"],
-        output_dir=(
-            f"results/metrics/"
-            f"{args.dataset}"
-        ),
+        output_dir=output_dir,
     )
 
 
