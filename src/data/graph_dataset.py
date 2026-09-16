@@ -12,30 +12,32 @@ from .propagation import load_propagation_tree
 
 class PropagationDataset(Dataset):
     """
-    Dataset for fake-news detection using:
-
-    - source tweet text
-    - linguistic features
-    - propagation tree structure
-    - propagation delays
+    Dataset for propagation-aware fake-news detection.
 
     Expected dataframe columns:
+        id
+        text
+        label
 
-    - id
-    - text
-    - label
+    Constructor order matches train_propagation.py:
+        PropagationDataset(
+            dataframe,
+            tokenizer,
+            tree_dir,
+            max_length,
+        )
     """
 
     def __init__(
         self,
         dataframe: pd.DataFrame,
-        tree_dir: str | Path,
         tokenizer: PreTrainedTokenizerBase,
+        tree_dir: str | Path,
         max_length: int = 256,
     ):
         self.df = dataframe.reset_index(drop=True)
-        self.tree_dir = Path(tree_dir)
         self.tokenizer = tokenizer
+        self.tree_dir = Path(tree_dir)
         self.max_length = max_length
 
     def __len__(self):
@@ -48,6 +50,7 @@ class PropagationDataset(Dataset):
         tweet_id = str(row["id"])
         label = int(row["label"])
 
+        # Source tweet tokenization
         encoded = self.tokenizer(
             text,
             truncation=True,
@@ -56,11 +59,13 @@ class PropagationDataset(Dataset):
             return_tensors="pt",
         )
 
+        # Linguistic features
         linguistic_features = torch.tensor(
             extract_linguistic_features(text),
             dtype=torch.float32,
         )
 
+        # Propagation tree
         tree = load_propagation_tree(
             self.tree_dir,
             tweet_id,
@@ -90,18 +95,16 @@ class PropagationDataset(Dataset):
             "node_features": node_features,
             "edge_index": edge_index,
             "delays": delays,
-            "label": torch.tensor(label, dtype=torch.long),
+            "label": torch.tensor(
+                label,
+                dtype=torch.long,
+            ),
         }
 
 
 def propagation_collate(batch: List[Dict]) -> Dict:
     """
     Collate function for variable-size propagation graphs.
-
-    Text and linguistic tensors are stacked.
-
-    Graph tensors remain lists because every propagation
-    tree contains a different number of nodes and edges.
     """
 
     return {
@@ -120,16 +123,20 @@ def propagation_collate(batch: List[Dict]) -> Dict:
             [item["linguistic_features"] for item in batch]
         ),
 
+        # Graphs have variable node/edge counts.
         "node_features": [
-            item["node_features"] for item in batch
+            item["node_features"]
+            for item in batch
         ],
 
         "edge_index": [
-            item["edge_index"] for item in batch
+            item["edge_index"]
+            for item in batch
         ],
 
         "delays": [
-            item["delays"] for item in batch
+            item["delays"]
+            for item in batch
         ],
 
         "labels": torch.stack(
@@ -139,5 +146,4 @@ def propagation_collate(batch: List[Dict]) -> Dict:
 
 
 # Backwards-compatible alias.
-# Some code may use the _fn name.
 propagation_collate_fn = propagation_collate
