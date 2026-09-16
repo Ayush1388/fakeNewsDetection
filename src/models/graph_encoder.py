@@ -10,6 +10,10 @@ class GraphAttentionLayer(nn.Module):
     Messages flow from parent -> child and child -> parent so that
     each propagation node can incorporate information from its
     local propagation neighborhood.
+
+    Attention logits and softmax are computed in float32 to remain
+    numerically stable when the surrounding model is running under
+    mixed precision.
     """
 
     def __init__(
@@ -24,7 +28,7 @@ class GraphAttentionLayer(nn.Module):
         if output_dim % heads != 0:
             raise ValueError(
                 f"output_dim ({output_dim}) must be divisible by "
-                f"heads ({heads})."
+                f"{heads}."
             )
 
         self.input_dim = input_dim
@@ -32,9 +36,23 @@ class GraphAttentionLayer(nn.Module):
         self.heads = heads
         self.head_dim = output_dim // heads
 
-        self.query = nn.Linear(input_dim, output_dim, bias=False)
-        self.key = nn.Linear(input_dim, output_dim, bias=False)
-        self.value = nn.Linear(input_dim, output_dim, bias=False)
+        self.query = nn.Linear(
+            input_dim,
+            output_dim,
+            bias=False,
+        )
+
+        self.key = nn.Linear(
+            input_dim,
+            output_dim,
+            bias=False,
+        )
+
+        self.value = nn.Linear(
+            input_dim,
+            output_dim,
+            bias=False,
+        )
 
         self.output_projection = nn.Linear(
             output_dim,
@@ -69,70 +87,157 @@ class GraphAttentionLayer(nn.Module):
         num_nodes = x.size(0)
 
         if num_nodes == 0:
-            return x.new_zeros((0, self.output_dim))
+            return x.new_zeros(
+                (0, self.output_dim)
+            )
+
+        # ---------------------------------------------------------
+        # Project node features.
+        # ---------------------------------------------------------
 
         q = self.query(x)
         k = self.key(x)
         v = self.value(x)
 
-        q = q.view(num_nodes, self.heads, self.head_dim)
-        k = k.view(num_nodes, self.heads, self.head_dim)
-        v = v.view(num_nodes, self.heads, self.head_dim)
+        q = q.view(
+            num_nodes,
+            self.heads,
+            self.head_dim,
+        )
 
-        # Add reverse edges so information propagates in both directions.
+        k = k.view(
+            num_nodes,
+            self.heads,
+            self.head_dim,
+        )
+
+        v = v.view(
+            num_nodes,
+            self.heads,
+            self.head_dim,
+        )
+
+        # ---------------------------------------------------------
+        # Build bidirectional propagation edges.
+        # ---------------------------------------------------------
+
         if edge_index.numel() > 0:
             src = edge_index[0]
             dst = edge_index[1]
 
-            src_all = torch.cat([src, dst], dim=0)
-            dst_all = torch.cat([dst, src], dim=0)
+            src_all = torch.cat(
+                [src, dst],
+                dim=0,
+            )
+
+            dst_all = torch.cat(
+                [dst, src],
+                dim=0,
+            )
+
         else:
             src_all = torch.empty(
                 0,
                 dtype=torch.long,
                 device=x.device,
             )
+
             dst_all = torch.empty(
                 0,
                 dtype=torch.long,
                 device=x.device,
             )
 
-        # Include self-loops.
+        # ---------------------------------------------------------
+        # Add self-loops.
+        # ---------------------------------------------------------
+
         self_nodes = torch.arange(
             num_nodes,
             device=x.device,
             dtype=torch.long,
         )
 
-        src_all = torch.cat([src_all, self_nodes], dim=0)
-        dst_all = torch.cat([dst_all, self_nodes], dim=0)
+        src_all = torch.cat(
+            [src_all, self_nodes],
+            dim=0,
+        )
 
-        # Attention score for each edge and head.
+        dst_all = torch.cat(
+            [dst_all, self_nodes],
+            dim=0,
+        )
+
+        # ---------------------------------------------------------
+        # Attention scores.
+        #
+        # IMPORTANT:
+        # Compute QK^T in float32 even when x is fp16/bf16.
+        # This prevents overflow/underflow in the custom
+        # attention branch during mixed-precision training.
+        # ---------------------------------------------------------
+
+        q_edges = q[dst_all].float()
+        k_edges = k[src_all].float()
+
         scores = (
-            q[dst_all] * k[src_all]
-        ).sum(dim=-1) / (self.head_dim ** 0.5)
+            q_edges * k_edges
+        ).sum(dim=-1) / (
+            self.head_dim ** 0.5
+        )
 
+        # ---------------------------------------------------------
         # Stable edge-wise softmax.
-        attention = torch.zeros_like(scores)
+        #
+        # Softmax is also explicitly performed in float32.
+        # ---------------------------------------------------------
+
+        attention = torch.zeros_like(
+            scores,
+            dtype=torch.float32,
+        )
 
         for node in range(num_nodes):
             mask = dst_all == node
 
             if mask.any():
+                node_scores = scores[mask]
+
+                # Explicit max subtraction gives us an additional
+                # numerical-stability safeguard.
+                node_scores = (
+                    node_scores
+                    - node_scores.max(
+                        dim=0,
+                        keepdim=True,
+                    ).values
+                )
+
                 attention[mask] = F.softmax(
-                    scores[mask],
+                    node_scores,
                     dim=0,
                 )
 
-        messages = v[src_all] * attention.unsqueeze(-1)
+        # ---------------------------------------------------------
+        # Message passing.
+        #
+        # Convert attention weights back to the value dtype so
+        # aggregation remains compatible with mixed precision.
+        # ---------------------------------------------------------
+
+        attention = attention.to(v.dtype)
+
+        messages = (
+            v[src_all]
+            * attention.unsqueeze(-1)
+        )
 
         aggregated = torch.zeros(
             num_nodes,
             self.heads,
             self.head_dim,
             device=x.device,
-            dtype=x.dtype,
+            dtype=v.dtype,
         )
 
         aggregated.index_add_(
@@ -146,12 +251,26 @@ class GraphAttentionLayer(nn.Module):
             self.output_dim,
         )
 
-        aggregated = self.output_projection(aggregated)
-        aggregated = self.dropout(aggregated)
+        # ---------------------------------------------------------
+        # Output projection.
+        # ---------------------------------------------------------
 
-        # Residual connection.
+        aggregated = self.output_projection(
+            aggregated
+        )
+
+        aggregated = self.dropout(
+            aggregated
+        )
+
+        # ---------------------------------------------------------
+        # Residual connection + normalization.
+        # ---------------------------------------------------------
+
+        residual = self.residual(x)
+
         aggregated = self.norm(
-            aggregated + self.residual(x)
+            aggregated + residual
         )
 
         return F.gelu(aggregated)
@@ -165,7 +284,8 @@ class GraphEncoder(nn.Module):
         Node-level propagation features.
 
     Output:
-        One fixed-size representation for the entire propagation tree.
+        One fixed-size representation for the entire
+        propagation tree.
     """
 
     def __init__(
@@ -179,7 +299,10 @@ class GraphEncoder(nn.Module):
         super().__init__()
 
         self.input_projection = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
+            nn.Linear(
+                input_dim,
+                hidden_dim,
+            ),
             nn.LayerNorm(hidden_dim),
             nn.GELU(),
             nn.Dropout(dropout),
@@ -200,12 +323,20 @@ class GraphEncoder(nn.Module):
         )
 
         self.attention_pool = nn.Sequential(
-            nn.Linear(output_dim, output_dim // 2),
+            nn.Linear(
+                output_dim,
+                output_dim // 2,
+            ),
             nn.Tanh(),
-            nn.Linear(output_dim // 2, 1),
+            nn.Linear(
+                output_dim // 2,
+                1,
+            ),
         )
 
-        self.output_norm = nn.LayerNorm(output_dim)
+        self.output_norm = nn.LayerNorm(
+            output_dim
+        )
 
         self.output_dim = output_dim
 
@@ -233,12 +364,26 @@ class GraphEncoder(nn.Module):
                 "[num_nodes, input_dim]."
             )
 
-        if edge_index.dim() != 2 or edge_index.size(0) != 2:
+        if (
+            edge_index.dim() != 2
+            or edge_index.size(0) != 2
+        ):
             raise ValueError(
-                "edge_index must have shape [2, num_edges]."
+                "edge_index must have shape "
+                "[2, num_edges]."
             )
 
-        x = self.input_projection(node_features)
+        # ---------------------------------------------------------
+        # Input projection.
+        # ---------------------------------------------------------
+
+        x = self.input_projection(
+            node_features
+        )
+
+        # ---------------------------------------------------------
+        # Graph message-passing layers.
+        # ---------------------------------------------------------
 
         x = self.graph_layer_1(
             x,
@@ -250,13 +395,33 @@ class GraphEncoder(nn.Module):
             edge_index,
         )
 
+        # ---------------------------------------------------------
         # Learned attention pooling over propagation nodes.
-        scores = self.attention_pool(x).squeeze(-1)
+        #
+        # Pooling scores are also calculated in float32 so the
+        # softmax remains stable under mixed precision.
+        # ---------------------------------------------------------
+
+        scores = self.attention_pool(
+            x
+        ).squeeze(-1)
+
+        scores_float = scores.float()
+
+        scores_float = (
+            scores_float
+            - scores_float.max(
+                dim=0,
+                keepdim=True,
+            ).values
+        )
 
         weights = torch.softmax(
-            scores,
+            scores_float,
             dim=0,
         )
+
+        weights = weights.to(x.dtype)
 
         graph_representation = torch.sum(
             x * weights.unsqueeze(-1),
