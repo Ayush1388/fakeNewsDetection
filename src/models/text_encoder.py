@@ -40,14 +40,27 @@ class TextEncoder(nn.Module):
 
         hidden = output.last_hidden_state
 
-        scores = self.attention(hidden).squeeze(-1)
+        # Keep the custom attention layer in the same
+        # dtype as the DeBERTa hidden states.
+        attention_dtype = hidden.dtype
+
+        scores = self.attention(
+            hidden.to(
+                self.attention[0].weight.dtype
+            )
+        ).squeeze(-1)
+
+        scores = scores.to(attention_dtype)
 
         scores = scores.masked_fill(
             attention_mask == 0,
-            -1e4,
+            torch.finfo(scores.dtype).min,
         )
 
-        weights = torch.softmax(scores, dim=-1)
+        weights = torch.softmax(
+            scores,
+            dim=-1,
+        )
 
         pooled = torch.sum(
             hidden * weights.unsqueeze(-1),
