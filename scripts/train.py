@@ -354,7 +354,7 @@ def main():
         model_name=model_name,
     )
 
-    model = model.to(device)
+    model = model.to(device).float()
 
     # --------------------------------------------------
     # Optimizer

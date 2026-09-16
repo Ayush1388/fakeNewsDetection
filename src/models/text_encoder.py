@@ -4,7 +4,6 @@ from transformers import AutoModel
 
 
 class TextEncoder(nn.Module):
-
     def __init__(
         self,
         model_name="microsoft/deberta-v3-base",
@@ -12,9 +11,14 @@ class TextEncoder(nn.Module):
     ):
         super().__init__()
 
+        # Always keep the pretrained backbone parameters in FP32.
+        # CUDA AMP will handle FP16 computation during training.
         self.backbone = AutoModel.from_pretrained(
-            model_name
+            model_name,
+            torch_dtype=torch.float32,
         )
+
+        self.backbone.float()
 
         hidden_size = self.backbone.config.hidden_size
 
@@ -32,7 +36,6 @@ class TextEncoder(nn.Module):
         input_ids,
         attention_mask,
     ):
-
         output = self.backbone(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -40,17 +43,7 @@ class TextEncoder(nn.Module):
 
         hidden = output.last_hidden_state
 
-        # Keep the custom attention layer in the same
-        # dtype as the DeBERTa hidden states.
-        attention_dtype = hidden.dtype
-
-        scores = self.attention(
-            hidden.to(
-                self.attention[0].weight.dtype
-            )
-        ).squeeze(-1)
-
-        scores = scores.to(attention_dtype)
+        scores = self.attention(hidden).squeeze(-1)
 
         scores = scores.masked_fill(
             attention_mask == 0,
