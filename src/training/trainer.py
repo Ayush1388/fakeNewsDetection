@@ -12,6 +12,7 @@ class Trainer:
         optimizer,
         criterion,
         device,
+        save_path,
         scheduler=None,
         max_grad_norm=1.0,
     ):
@@ -19,6 +20,7 @@ class Trainer:
         self.optimizer = optimizer
         self.criterion = criterion
         self.device = device
+        self.save_path = save_path
         self.scheduler = scheduler
         self.max_grad_norm = max_grad_norm
 
@@ -121,7 +123,11 @@ class Trainer:
 
         return loss, output, labels
 
-    def _run_epoch(self, loader, training=True):
+    def _run_epoch(
+        self,
+        loader,
+        training=True,
+    ):
         if training:
             self.model.train()
         else:
@@ -137,6 +143,7 @@ class Trainer:
         )
 
         for batch in progress:
+
             if training:
                 self.optimizer.zero_grad(
                     set_to_none=True
@@ -147,7 +154,9 @@ class Trainer:
                 )
 
                 if self.use_amp:
-                    self.scaler.scale(loss).backward()
+                    self.scaler.scale(
+                        loss
+                    ).backward()
 
                     self.scaler.unscale_(
                         self.optimizer
@@ -180,11 +189,10 @@ class Trainer:
                         self._forward_loss(batch)
                     )
 
-            if (
-                not torch.isfinite(loss)
-            ):
+            if not torch.isfinite(loss):
                 raise RuntimeError(
-                    f"Non-finite loss detected: {loss.item()}"
+                    "Non-finite loss detected: "
+                    f"{loss.item()}"
                 )
 
             predictions = torch.argmax(
@@ -236,16 +244,18 @@ class Trainer:
         train_loader,
         val_loader,
         epochs,
-        checkpoint_path,
     ):
         best_val_f1 = -float("inf")
 
         os.makedirs(
-            os.path.dirname(checkpoint_path),
+            os.path.dirname(self.save_path),
             exist_ok=True,
         )
 
-        for epoch in range(1, epochs + 1):
+        for epoch in range(
+            1,
+            epochs + 1,
+        ):
             print(
                 f"\nEpoch {epoch}/{epochs}"
             )
@@ -282,19 +292,17 @@ class Trainer:
 
                 torch.save(
                     {
-                        "model_state_dict": (
-                            self.model.state_dict()
-                        ),
-                        "optimizer_state_dict": (
-                            self.optimizer.state_dict()
-                        ),
+                        "model_state_dict":
+                            self.model.state_dict(),
+                        "optimizer_state_dict":
+                            self.optimizer.state_dict(),
                         "epoch": epoch,
                         "val_f1": val_f1,
                     },
-                    checkpoint_path,
+                    self.save_path,
                 )
 
                 print(
-                    f"Saved best checkpoint: "
-                    f"{checkpoint_path}"
+                    "Saved best checkpoint: "
+                    f"{self.save_path}"
                 )
