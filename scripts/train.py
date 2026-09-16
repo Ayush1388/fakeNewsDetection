@@ -1,65 +1,23 @@
-import sys
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
 import argparse
 import random
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from transformers import AutoTokenizer
-from sklearn.model_selection import train_test_split
 
 from src.data.loaders import load_dataset
-from src.data.dataset import FakeNewsDataset
-from src.models.tegfnd import TEGFND
+from src.data.graph_dataset import (
+    PropagationDataset,
+    propagation_collate,
+)
+from src.models.rumor_model import PropagationRumorModel
 from src.models.deberta_baseline import DeBERTaBaseline
 from src.training.losses import WeightedCrossEntropy
 from src.training.trainer import Trainer
 
 
-TRANSFORMER_NAME = "microsoft/deberta-v3-base"
-
-
-DATASETS = {
-    "twitter15": {
-        "path": "data/twitter15",
-        "classes": [
-            "non-rumor",
-            "true",
-            "false",
-            "unverified",
-        ],
-    },
-    "twitter16": {
-        "path": "data/twitter16",
-        "classes": [
-            "non-rumor",
-            "true",
-            "false",
-            "unverified",
-        ],
-    },
-    "politifact": {
-        "path": "data/politifact/politifact_factcheck_data.json",
-        "classes": [
-            "pants-fire",
-            "false",
-            "mostly-false",
-            "half-true",
-            "mostly-true",
-            "true",
-        ],
-    },
-}
-
-
-def seed_everything(seed):
+def set_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -68,44 +26,76 @@ def seed_everything(seed):
         torch.cuda.manual_seed_all(seed)
 
 
-def build_splits(df, seed):
+def get_num_classes(dataset_name):
+    if dataset_name in {"twitter15", "twitter16"}:
+        return 4
 
-    train_df, temp_df = train_test_split(
-        df,
-        test_size=0.30,
-        random_state=seed,
-        stratify=df["label"],
+    if dataset_name == "politifact":
+        return 6
+
+    raise ValueError(
+        f"Unsupported dataset: {dataset_name}"
     )
 
-    val_df, test_df = train_test_split(
-        temp_df,
-        test_size=0.50,
-        random_state=seed,
-        stratify=temp_df["label"],
-    )
 
-    return (
-        train_df.reset_index(drop=True),
-        val_df.reset_index(drop=True),
-        test_df.reset_index(drop=True),
+def get_tree_dir(dataset_name):
+    if dataset_name == "twitter15":
+        return "data/twitter15/tree"
+
+    if dataset_name == "twitter16":
+        return "data/twitter16/tree"
+
+    raise ValueError(
+        "Propagation trees are currently available "
+        "for Twitter15 and Twitter16 only."
     )
 
 
 def build_model(
     model_type,
     num_classes,
+    model_name,
 ):
-
     if model_type == "deberta":
-
         return DeBERTaBaseline(
             num_classes=num_classes,
-            model_name=TRANSFORMER_NAME,
+            model_name=model_name,
         )
 
-    return TEGFND(
-        num_classes=num_classes,
-        model_name=TRANSFORMER_NAME,
+    if model_type == "propagation":
+        return PropagationRumorModel(
+            num_classes=num_classes,
+            model_name=model_name,
+            linguistic_dim=14,
+            graph_input_dim=8,
+            feature_dim=256,
+            temporal_dim=256,
+            fusion_dim=256,
+            dropout=0.2,
+        )
+
+    raise ValueError(
+        f"Unsupported model: {model_type}"
+    )
+
+
+def create_splits(
+    dataset,
+    seed,
+):
+    total_size = len(dataset)
+
+    train_size = int(0.70 * total_size)
+    val_size = int(0.15 * total_size)
+    test_size = total_size - train_size - val_size
+
+    generator = torch.Generator()
+    generator.manual_seed(seed)
+
+    return random_split(
+        dataset,
+        [train_size, val_size, test_size],
+        generator=generator,
     )
 
 
@@ -115,15 +105,21 @@ def main():
 
     parser.add_argument(
         "--dataset",
+        type=str,
         required=True,
-        choices=DATASETS.keys(),
+        choices=[
+            "twitter15",
+            "twitter16",
+            "politifact",
+        ],
     )
 
     parser.add_argument(
         "--model",
-        default="tegfnd",
+        type=str,
+        default="propagation",
         choices=[
-            "tegfnd",
+            "propagation",
             "deberta",
         ],
     )
@@ -137,7 +133,7 @@ def main():
     parser.add_argument(
         "--batch-size",
         type=int,
-        default=8,
+        default=4,
     )
 
     parser.add_argument(
@@ -158,9 +154,29 @@ def main():
         default=42,
     )
 
+    parser.add_argument(
+        "--num-workers",
+        type=int,
+        default=0,
+    )
+
+    parser.add_argument(
+        "--save-path",
+        type=str,
+        default=None,
+    )
+
     args = parser.parse_args()
 
-    seed_everything(args.seed)
+    # --------------------------------------------------
+    # Reproducibility
+    # --------------------------------------------------
+
+    set_seed(args.seed)
+
+    # --------------------------------------------------
+    # Device
+    # --------------------------------------------------
 
     device = torch.device(
         "cuda"
@@ -171,63 +187,101 @@ def main():
     print(f"Device: {device}")
     print(f"Dataset: {args.dataset}")
     print(f"Model: {args.model}")
+    print(f"Seed: {args.seed}")
 
-    config = DATASETS[
+    # --------------------------------------------------
+    # Dataset
+    # --------------------------------------------------
+
+    dataframe = load_dataset(
         args.dataset
-    ]
-
-    dataset_path = (
-        PROJECT_ROOT
-        / config["path"]
-    )
-
-    df = load_dataset(
-        args.dataset,
-        dataset_path,
     )
 
     print(
-        f"Loaded {len(df)} samples."
+        f"Loaded samples: {len(dataframe)}"
     )
 
-    train_df, val_df, test_df = build_splits(
-        df,
-        args.seed,
-    )
+    # --------------------------------------------------
+    # Tokenizer
+    # --------------------------------------------------
 
-    print(
-        f"Train samples: {len(train_df)}"
-    )
-
-    print(
-        f"Validation samples: {len(val_df)}"
-    )
-
-    print(
-        f"Test samples: {len(test_df)}"
-    )
+    model_name = "microsoft/deberta-v3-base"
 
     tokenizer = AutoTokenizer.from_pretrained(
-        TRANSFORMER_NAME
+        model_name
     )
 
-    train_dataset = FakeNewsDataset(
-        train_df,
-        tokenizer,
-        max_length=args.max_length,
+    # --------------------------------------------------
+    # Dataset construction
+    # --------------------------------------------------
+
+    if args.model == "propagation":
+
+        if args.dataset not in {
+            "twitter15",
+            "twitter16",
+        }:
+            raise ValueError(
+                "Propagation model currently supports "
+                "Twitter15 and Twitter16 only."
+            )
+
+        dataset = PropagationDataset(
+            dataframe=dataframe,
+            tokenizer=tokenizer,
+            tree_dir=get_tree_dir(
+                args.dataset
+            ),
+            max_length=args.max_length,
+        )
+
+        collate_fn = propagation_collate
+
+    else:
+
+        from src.data.dataset import FakeNewsDataset
+
+        dataset = FakeNewsDataset(
+            dataframe=dataframe,
+            tokenizer=tokenizer,
+            max_length=args.max_length,
+        )
+
+        collate_fn = None
+
+    # --------------------------------------------------
+    # Train / validation / test split
+    # --------------------------------------------------
+
+    train_dataset, val_dataset, test_dataset = (
+        create_splits(
+            dataset,
+            args.seed,
+        )
     )
 
-    val_dataset = FakeNewsDataset(
-        val_df,
-        tokenizer,
-        max_length=args.max_length,
+    print(
+        f"Train: {len(train_dataset)}"
     )
+
+    print(
+        f"Validation: {len(val_dataset)}"
+    )
+
+    print(
+        f"Test: {len(test_dataset)}"
+    )
+
+    # --------------------------------------------------
+    # DataLoaders
+    # --------------------------------------------------
 
     train_loader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
         shuffle=True,
-        num_workers=2,
+        num_workers=args.num_workers,
+        collate_fn=collate_fn,
         pin_memory=torch.cuda.is_available(),
     )
 
@@ -235,16 +289,39 @@ def main():
         val_dataset,
         batch_size=args.batch_size,
         shuffle=False,
-        num_workers=2,
+        num_workers=args.num_workers,
+        collate_fn=collate_fn,
         pin_memory=torch.cuda.is_available(),
     )
 
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=args.batch_size,
+        shuffle=False,
+        num_workers=args.num_workers,
+        collate_fn=collate_fn,
+        pin_memory=torch.cuda.is_available(),
+    )
+
+    # --------------------------------------------------
+    # Model
+    # --------------------------------------------------
+
+    num_classes = get_num_classes(
+        args.dataset
+    )
+
     model = build_model(
-        args.model,
-        len(config["classes"]),
+        model_type=args.model,
+        num_classes=num_classes,
+        model_name=model_name,
     )
 
     model = model.to(device)
+
+    # --------------------------------------------------
+    # Optimizer
+    # --------------------------------------------------
 
     optimizer = torch.optim.AdamW(
         model.parameters(),
@@ -252,22 +329,48 @@ def main():
         weight_decay=0.01,
     )
 
+    # --------------------------------------------------
+    # Loss
+    # --------------------------------------------------
+
     criterion = WeightedCrossEntropy()
 
-    checkpoint_path = (
-        PROJECT_ROOT
-        / "results"
-        / "checkpoints"
-        / f"{args.dataset}_{args.model}_best.pt"
+    # --------------------------------------------------
+    # Checkpoint
+    # --------------------------------------------------
+
+    if args.save_path is not None:
+
+        save_path = args.save_path
+
+    else:
+
+        save_path = (
+            f"results/checkpoints/"
+            f"{args.dataset}_"
+            f"{args.model}_"
+            f"seed{args.seed}.pt"
+        )
+
+    print(
+        f"Checkpoint: {save_path}"
     )
+
+    # --------------------------------------------------
+    # Trainer
+    # --------------------------------------------------
 
     trainer = Trainer(
         model=model,
         optimizer=optimizer,
         criterion=criterion,
         device=device,
-        save_path=checkpoint_path,
+        save_path=save_path,
     )
+
+    # --------------------------------------------------
+    # Training
+    # --------------------------------------------------
 
     history = trainer.fit(
         train_loader=train_loader,
@@ -275,16 +378,27 @@ def main():
         epochs=args.epochs,
     )
 
-    print("\nTraining complete.")
+    # --------------------------------------------------
+    # Save training history
+    # --------------------------------------------------
 
-    print(
-        f"Best validation F1: "
-        f"{trainer.best_f1:.4f}"
+    history_path = (
+        save_path
+        .replace(".pt", "_history.pt")
+    )
+
+    torch.save(
+        history,
+        history_path,
     )
 
     print(
-        f"Checkpoint: "
-        f"{checkpoint_path}"
+        f"\nTraining history saved → "
+        f"{history_path}"
+    )
+
+    print(
+        "\nTraining complete."
     )
 
 

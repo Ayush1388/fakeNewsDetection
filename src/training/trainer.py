@@ -29,6 +29,42 @@ class Trainer:
 
         self.best_f1 = -1.0
 
+    def _move_graphs_to_device(
+        self,
+        node_features,
+        edge_index,
+        delays,
+    ):
+        """
+        Move variable-sized propagation graphs
+        to the target device.
+
+        Each batch contains a list of graphs because
+        every propagation tree can have a different
+        number of nodes and edges.
+        """
+
+        node_features = [
+            nodes.to(self.device)
+            for nodes in node_features
+        ]
+
+        edge_index = [
+            edges.to(self.device)
+            for edges in edge_index
+        ]
+
+        delays = [
+            delay.to(self.device)
+            for delay in delays
+        ]
+
+        return (
+            node_features,
+            edge_index,
+            delays,
+        )
+
     def _run_epoch(
         self,
         loader,
@@ -53,9 +89,9 @@ class Trainer:
 
         for batch in iterator:
 
-            input_ids = batch["input_ids"].to(
-                self.device
-            )
+            input_ids = batch[
+                "input_ids"
+            ].to(self.device)
 
             attention_mask = batch[
                 "attention_mask"
@@ -65,8 +101,32 @@ class Trainer:
                 "linguistic_features"
             ].to(self.device)
 
-            target = batch["labels"].to(
-                self.device
+            target = batch[
+                "labels"
+            ].to(self.device)
+
+            # Propagation information is stored as
+            # variable-sized graph lists.
+            node_features = batch[
+                "node_features"
+            ]
+
+            edge_index = batch[
+                "edge_index"
+            ]
+
+            delays = batch[
+                "delays"
+            ]
+
+            (
+                node_features,
+                edge_index,
+                delays,
+            ) = self._move_graphs_to_device(
+                node_features,
+                edge_index,
+                delays,
             )
 
             if training:
@@ -80,6 +140,9 @@ class Trainer:
                     input_ids=input_ids,
                     attention_mask=attention_mask,
                     linguistic_features=linguistic_features,
+                    node_features=node_features,
+                    edge_index=edge_index,
+                    delays=delays,
                 )
 
                 loss = self.criterion(
@@ -100,16 +163,22 @@ class Trainer:
 
             total_loss += loss.item()
 
-            pred = output["logits"].argmax(
+            pred = output[
+                "logits"
+            ].argmax(
                 dim=-1
             )
 
             predictions.extend(
-                pred.detach().cpu().numpy()
+                pred.detach()
+                .cpu()
+                .numpy()
             )
 
             labels.extend(
-                target.detach().cpu().numpy()
+                target.detach()
+                .cpu()
+                .numpy()
             )
 
         macro_f1 = f1_score(
@@ -120,7 +189,10 @@ class Trainer:
         )
 
         return {
-            "loss": total_loss / max(len(loader), 1),
+            "loss": (
+                total_loss
+                / max(len(loader), 1)
+            ),
             "macro_f1": macro_f1,
         }
 
@@ -151,41 +223,65 @@ class Trainer:
             history.append(
                 {
                     "epoch": epoch,
-                    "train_loss": train_metrics["loss"],
-                    "train_f1": train_metrics["macro_f1"],
-                    "val_loss": val_metrics["loss"],
-                    "val_f1": val_metrics["macro_f1"],
+                    "train_loss": train_metrics[
+                        "loss"
+                    ],
+                    "train_f1": train_metrics[
+                        "macro_f1"
+                    ],
+                    "val_loss": val_metrics[
+                        "loss"
+                    ],
+                    "val_f1": val_metrics[
+                        "macro_f1"
+                    ],
                 }
             )
 
-            print(f"\nEpoch {epoch}/{epochs}")
-
             print(
-                f"Train Loss: {train_metrics['loss']:.4f} | "
-                f"Train F1: {train_metrics['macro_f1']:.4f}"
+                f"\nEpoch {epoch}/{epochs}"
             )
 
             print(
-                f"Val Loss: {val_metrics['loss']:.4f} | "
-                f"Val F1: {val_metrics['macro_f1']:.4f}"
+                f"Train Loss: "
+                f"{train_metrics['loss']:.4f} | "
+                f"Train F1: "
+                f"{train_metrics['macro_f1']:.4f}"
             )
 
-            if val_metrics["macro_f1"] > self.best_f1:
+            print(
+                f"Val Loss: "
+                f"{val_metrics['loss']:.4f} | "
+                f"Val F1: "
+                f"{val_metrics['macro_f1']:.4f}"
+            )
 
-                self.best_f1 = val_metrics["macro_f1"]
+            if (
+                val_metrics["macro_f1"]
+                > self.best_f1
+            ):
+
+                self.best_f1 = (
+                    val_metrics["macro_f1"]
+                )
 
                 torch.save(
                     {
-                        "model_state_dict": self.model.state_dict(),
-                        "optimizer_state_dict": self.optimizer.state_dict(),
-                        "epoch": epoch,
-                        "val_f1": self.best_f1,
+                        "model_state_dict":
+                            self.model.state_dict(),
+                        "optimizer_state_dict":
+                            self.optimizer.state_dict(),
+                        "epoch":
+                            epoch,
+                        "val_f1":
+                            self.best_f1,
                     },
                     self.save_path,
                 )
 
                 print(
-                    f"Saved best model → {self.save_path}"
+                    f"Saved best model → "
+                    f"{self.save_path}"
                 )
 
         return history
