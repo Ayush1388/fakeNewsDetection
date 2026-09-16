@@ -38,6 +38,24 @@ def get_num_classes(dataset_name):
     )
 
 
+def get_dataset_path(dataset_name):
+    paths = {
+        "twitter15": "data/twitter15",
+        "twitter16": "data/twitter16",
+        "politifact": (
+            "data/politifact/"
+            "politifact_factcheck_data.json"
+        ),
+    }
+
+    if dataset_name not in paths:
+        raise ValueError(
+            f"Unsupported dataset: {dataset_name}"
+        )
+
+    return paths[dataset_name]
+
+
 def get_tree_dir(dataset_name):
     if dataset_name == "twitter15":
         return "data/twitter15/tree"
@@ -87,14 +105,22 @@ def create_splits(
 
     train_size = int(0.70 * total_size)
     val_size = int(0.15 * total_size)
-    test_size = total_size - train_size - val_size
+    test_size = (
+        total_size
+        - train_size
+        - val_size
+    )
 
     generator = torch.Generator()
     generator.manual_seed(seed)
 
     return random_split(
         dataset,
-        [train_size, val_size, test_size],
+        [
+            train_size,
+            val_size,
+            test_size,
+        ],
         generator=generator,
     )
 
@@ -193,8 +219,13 @@ def main():
     # Dataset
     # --------------------------------------------------
 
-    dataframe = load_dataset(
+    dataset_path = get_dataset_path(
         args.dataset
+    )
+
+    dataframe = load_dataset(
+        args.dataset,
+        dataset_path,
     )
 
     print(
@@ -205,7 +236,9 @@ def main():
     # Tokenizer
     # --------------------------------------------------
 
-    model_name = "microsoft/deberta-v3-base"
+    model_name = (
+        "microsoft/deberta-v3-base"
+    )
 
     tokenizer = AutoTokenizer.from_pretrained(
         model_name
@@ -239,7 +272,9 @@ def main():
 
     else:
 
-        from src.data.dataset import FakeNewsDataset
+        from src.data.dataset import (
+            FakeNewsDataset
+        )
 
         dataset = FakeNewsDataset(
             dataframe=dataframe,
@@ -253,11 +288,13 @@ def main():
     # Train / validation / test split
     # --------------------------------------------------
 
-    train_dataset, val_dataset, test_dataset = (
-        create_splits(
-            dataset,
-            args.seed,
-        )
+    (
+        train_dataset,
+        val_dataset,
+        test_dataset,
+    ) = create_splits(
+        dataset,
+        args.seed,
     )
 
     print(
@@ -346,7 +383,7 @@ def main():
     else:
 
         save_path = (
-            f"results/checkpoints/"
+            "results/checkpoints/"
             f"{args.dataset}_"
             f"{args.model}_"
             f"seed{args.seed}.pt"
@@ -382,9 +419,9 @@ def main():
     # Save training history
     # --------------------------------------------------
 
-    history_path = (
-        save_path
-        .replace(".pt", "_history.pt")
+    history_path = save_path.replace(
+        ".pt",
+        "_history.pt",
     )
 
     torch.save(
