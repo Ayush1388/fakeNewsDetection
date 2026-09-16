@@ -1,95 +1,43 @@
-from __future__ import annotations
-
 import torch
 import torch.nn as nn
 
 
-class TemporalPropagationEncoder(nn.Module):
+class TemporalEncoder(nn.Module):
+    """
+    Encodes temporal propagation statistics into a fixed-size vector.
+    """
 
     def __init__(
         self,
+        input_dim=8,
         hidden_dim=128,
+        output_dim=256,
         dropout=0.2,
     ):
         super().__init__()
 
         self.network = nn.Sequential(
-
-            nn.Linear(
-                8,
-                hidden_dim,
-            ),
-
-            nn.LayerNorm(
-                hidden_dim
-            ),
-
+            nn.Linear(input_dim, hidden_dim),
+            nn.LayerNorm(hidden_dim),
             nn.GELU(),
+            nn.Dropout(dropout),
 
-            nn.Dropout(
-                dropout
-            ),
-
-            nn.Linear(
-                hidden_dim,
-                hidden_dim,
-            ),
-
+            nn.Linear(hidden_dim, output_dim),
+            nn.LayerNorm(output_dim),
             nn.GELU(),
-
-            nn.Dropout(
-                dropout
-            ),
+            nn.Dropout(dropout),
         )
 
-    def forward(
-        self,
-        delays,
-    ):
+        self.output_dim = output_dim
 
-        if delays.numel() == 0:
+    def forward(self, temporal_features):
+        if temporal_features.dim() == 1:
+            temporal_features = temporal_features.unsqueeze(0)
 
-            statistics = torch.zeros(
-                8,
-                device=delays.device,
-            )
+        output = self.network(temporal_features)
 
-        else:
+        # A tree has one temporal-statistics vector, so return [output_dim].
+        if output.size(0) == 1:
+            return output.squeeze(0)
 
-            delays = torch.clamp(
-                delays,
-                min=0.0,
-            )
-
-            log_delays = torch.log1p(
-                delays
-            )
-
-            statistics = torch.stack(
-                [
-                    log_delays.mean(),
-
-                    log_delays.median(),
-
-                    log_delays.max(),
-
-                    delays.std()
-                    if delays.numel() > 1
-                    else torch.tensor(
-                        0.0,
-                        device=delays.device,
-                    ),
-
-                    (delays <= 1.0).float().mean(),
-
-                    (delays <= 5.0).float().mean(),
-
-                    (delays <= 30.0).float().mean(),
-
-                    (delays <= 60.0).float().mean(),
-                ]
-            )
-
-        return self.network(
-            statistics
-        )
+        return output.mean(dim=0)
