@@ -143,7 +143,6 @@ class Trainer:
         )
 
         for batch in progress:
-
             if training:
                 self.optimizer.zero_grad(
                     set_to_none=True
@@ -242,7 +241,7 @@ class Trainer:
     def fit(
         self,
         train_loader,
-        val_loader,
+        validation_loader,
         epochs,
     ):
         best_val_f1 = -float("inf")
@@ -269,7 +268,7 @@ class Trainer:
 
             val_loss, val_f1 = (
                 self._run_epoch(
-                    val_loader,
+                    validation_loader,
                     training=False,
                 )
             )
