@@ -426,6 +426,25 @@ class PropagationRumorModel(nn.Module):
         )
 
         # --------------------------------------------------
+        # Match the dtype expected by the custom
+        # fusion layers.
+        #
+        # DeBERTa may run in FP16 on CUDA while the
+        # custom layers remain in FP32.
+        # --------------------------------------------------
+
+        semantic_dtype = (
+            self.fusion
+            .semantic_projection
+            .weight
+            .dtype
+        )
+
+        semantic = semantic.to(
+            semantic_dtype
+        )
+
+        # --------------------------------------------------
         # Linguistic representation
         # --------------------------------------------------
 
@@ -457,13 +476,17 @@ class PropagationRumorModel(nn.Module):
             )
 
             # Build the eight temporal statistics
-            temporal_features = self.build_temporal_features(
-                delay
+            temporal_features = (
+                self.build_temporal_features(
+                    delay
+                )
             )
 
             # Temporal representation
-            temporal_representation = self.temporal_encoder(
-                temporal_features
+            temporal_representation = (
+                self.temporal_encoder(
+                    temporal_features
+                )
             )
 
             temporal_representations.append(
