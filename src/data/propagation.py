@@ -36,33 +36,12 @@ def _safe_float(value: str) -> float:
 
 
 def parse_tree_file(path: str | Path) -> dict:
-    """
-    Parse one Twitter15/Twitter16 propagation tree.
-
-    Node format:
-        [user_id, tweet_id, time_delay]
-
-    Edge format:
-        parent -> child
-
-    Important dataset properties handled here:
-    - explicit ROOT -> source edges
-    - files without an explicit ROOT edge
-    - negative raw timestamps/delays
-    - duplicate edges
-    - self-loops
-    - cycles
-    - disconnected nodes
-    """
-
     path = Path(path)
 
-    raw_edges: list[tuple[tuple[str, str, str],
-                           tuple[str, str, str]]] = []
-
     nodes: set[tuple[str, str, str]] = set()
+    raw_edges = []
 
-    explicit_root: tuple[str, str, str] | None = None
+    explicit_root = None
 
     with path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -73,13 +52,10 @@ def parse_tree_file(path: str | Path) -> dict:
 
             left, right = line.split("->", 1)
 
-            try:
-                parent = _parse_node(left)
-                child = _parse_node(right)
-            except Exception:
-                continue
+            parent = _parse_node(left)
+            child = _parse_node(right)
 
-            # ROOT -> actual tree root.
+            # Explicit ROOT -> actual propagation root.
             if parent[0] == "ROOT":
                 explicit_root = child
                 nodes.add(child)
@@ -93,14 +69,6 @@ def parse_tree_file(path: str | Path) -> dict:
     if not nodes:
         raise ValueError(f"No valid nodes found in {path}")
 
-    # ------------------------------------------------------------------
-    # Build unique node identities.
-    #
-    # Node identity MUST be (user_id, tweet_id, raw_time).
-    # The Twitter16 dataset can contain multiple users with the same
-    # tweet ID.
-    # ------------------------------------------------------------------
-
     node_list = list(nodes)
 
     node_to_idx = {
@@ -108,156 +76,185 @@ def parse_tree_file(path: str | Path) -> dict:
         for idx, node in enumerate(node_list)
     }
 
-    # ------------------------------------------------------------------
-    # Determine root.
+    # ---------------------------------------------------------------
+    # Unique edges + remove self loops.
+    # ---------------------------------------------------------------
+
+    unique_edges = set()
+
+    for parent, child in raw_edges:
+        if parent not in node_to_idx:
+            continue
+
+        if child not in node_to_idx:
+            continue
+
+        p = node_to_idx[parent]
+        c = node_to_idx[child]
+
+        if p == c:
+            continue
+
+        unique_edges.add((p, c))
+
+    # ---------------------------------------------------------------
+    # Incoming / outgoing degree.
+    # ---------------------------------------------------------------
+
+    incoming = np.zeros(
+        len(node_list),
+        dtype=np.float32,
+    )
+
+    outgoing = np.zeros(
+        len(node_list),
+        dtype=np.float32,
+    )
+
+    for p, c in unique_edges:
+        outgoing[p] += 1.0
+        incoming[c] += 1.0
+
+    # ---------------------------------------------------------------
+    # ROOT SELECTION
     #
-    # Preferred:
-    #   explicit ROOT -> node
+    # Priority:
     #
-    # Fallback:
-    #   node with zero incoming edges.
+    # 1. Explicit ROOT -> node.
+    # 2. Filename tweet ID with zero incoming edges.
+    # 3. Any filename tweet ID.
+    # 4. Zero-incoming node.
+    # 5. Node with minimum absolute timestamp.
     #
-    # Final fallback:
-    #   node whose tweet ID equals the tree filename.
-    # ------------------------------------------------------------------
+    # This handles files in which the explicit ROOT edge is absent.
+    # ---------------------------------------------------------------
 
     root = None
 
-    if explicit_root is not None and explicit_root in node_to_idx:
+    if explicit_root is not None:
         root = explicit_root
 
-    # Build incoming/outgoing relationships first.
-    unique_edges: set[tuple[int, int]] = set()
+    filename_tweet_id = path.stem
 
-    for parent, child in raw_edges:
-        if parent not in node_to_idx or child not in node_to_idx:
-            continue
-
-        parent_idx = node_to_idx[parent]
-        child_idx = node_to_idx[child]
-
-        # Ignore self-loops.
-        if parent_idx == child_idx:
-            continue
-
-        unique_edges.add((parent_idx, child_idx))
-
-    incoming = [0] * len(node_list)
-
-    for parent_idx, child_idx in unique_edges:
-        incoming[child_idx] += 1
-
-    # Fallback 1: indegree-zero nodes.
     if root is None:
-        root_candidates = [
+        candidates = [
             node
             for idx, node in enumerate(node_list)
             if incoming[idx] == 0
+            and node[1] == filename_tweet_id
         ]
 
-        if root_candidates:
-            # Prefer the node whose tweet ID matches the tree filename.
-            filename_tweet_id = path.stem
+        if candidates:
+            root = min(
+                candidates,
+                key=lambda node: abs(
+                    _safe_float(node[2])
+                ),
+            )
 
-            matching = [
-                node
-                for node in root_candidates
-                if node[1] == filename_tweet_id
-            ]
-
-            if matching:
-                root = matching[0]
-            else:
-                # If several roots exist, prefer the node with the
-                # smallest absolute raw timestamp.
-                root = min(
-                    root_candidates,
-                    key=lambda node: abs(_safe_float(node[2])),
-                )
-
-    # Fallback 2: filename tweet ID.
     if root is None:
-        filename_tweet_id = path.stem
-
-        filename_candidates = [
+        candidates = [
             node
             for node in node_list
             if node[1] == filename_tweet_id
         ]
 
-        if filename_candidates:
+        if candidates:
             root = min(
-                filename_candidates,
-                key=lambda node: abs(_safe_float(node[2])),
+                candidates,
+                key=lambda node: abs(
+                    _safe_float(node[2])
+                ),
             )
 
     if root is None:
-        raise ValueError(
-            f"Could not determine root node in {path}"
+        candidates = [
+            node
+            for idx, node in enumerate(node_list)
+            if incoming[idx] == 0
+        ]
+
+        if candidates:
+            root = min(
+                candidates,
+                key=lambda node: abs(
+                    _safe_float(node[2])
+                ),
+            )
+
+    if root is None:
+        root = min(
+            node_list,
+            key=lambda node: abs(
+                _safe_float(node[2])
+            ),
         )
 
     root_idx = node_to_idx[root]
 
-    # ------------------------------------------------------------------
-    # Build adjacency.
-    # ------------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # Adjacency.
+    # ---------------------------------------------------------------
 
-    adjacency: dict[int, list[int]] = defaultdict(list)
+    adjacency = defaultdict(list)
 
-    for parent_idx, child_idx in sorted(unique_edges):
-        adjacency[parent_idx].append(child_idx)
+    for p, c in sorted(unique_edges):
+        adjacency[p].append(c)
 
-    # ------------------------------------------------------------------
-    # Calculate graph depth.
+    # ---------------------------------------------------------------
+    # BFS depth.
     #
-    # BFS is used instead of recursive traversal so cycles cannot
-    # cause infinite recursion.
-    # ------------------------------------------------------------------
+    # Cycles are safe because visited nodes are never re-enqueued.
+    # ---------------------------------------------------------------
 
     depth = np.full(
         len(node_list),
-        -1,
+        -1.0,
         dtype=np.float32,
     )
 
     depth[root_idx] = 0.0
 
     queue = deque([root_idx])
+    visited = {root_idx}
+
+    bfs_order = [root_idx]
 
     while queue:
         current = queue.popleft()
 
         for child in adjacency[current]:
-            if depth[child] == -1:
-                depth[child] = depth[current] + 1.0
-                queue.append(child)
 
-    # ------------------------------------------------------------------
-    # Handle nodes disconnected from the selected root.
+            if child in visited:
+                continue
+
+            visited.add(child)
+
+            depth[child] = (
+                depth[current] + 1.0
+            )
+
+            bfs_order.append(child)
+            queue.append(child)
+
+    # ---------------------------------------------------------------
+    # Disconnected components.
     #
-    # They remain valid graph nodes but are assigned depth 0 rather
-    # than creating invalid negative/unreachable values.
-    # ------------------------------------------------------------------
+    # Keep them as valid nodes. Assign depth 0 so the feature tensor
+    # remains finite and well-defined.
+    # ---------------------------------------------------------------
 
-    disconnected = depth < 0
+    depth[depth < 0] = 0.0
 
-    if np.any(disconnected):
-        depth[disconnected] = 0.0
-
-    # ------------------------------------------------------------------
-    # Sanitize temporal values.
+    # ---------------------------------------------------------------
+    # TEMPORAL DELAYS
     #
-    # Some Twitter15/16 propagation files contain negative raw values.
-    # These represent timestamps occurring before the source-relative
-    # zero point and should not be passed into log-based temporal
+    # Raw Twitter data contains negative relative values for some
+    # nodes. These cannot be used directly by log-based temporal
     # features.
     #
-    # The model therefore uses:
-    #
-    #     sanitized_delay = max(raw_delay, 0)
-    #
-    # Root is always exactly zero.
-    # ------------------------------------------------------------------
+    # Clamp all negative values to zero.
+    # ---------------------------------------------------------------
 
     delays = np.asarray(
         [
@@ -269,141 +266,134 @@ def parse_tree_file(path: str | Path) -> dict:
 
     delays[root_idx] = 0.0
 
-    # ------------------------------------------------------------------
-    # Graph degree statistics.
-    # ------------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # Subtree sizes.
+    # ---------------------------------------------------------------
 
-    num_nodes = len(node_list)
-
-    in_degree = np.zeros(
-        num_nodes,
+    subtree_size = np.ones(
+        len(node_list),
         dtype=np.float32,
     )
-
-    out_degree = np.zeros(
-        num_nodes,
-        dtype=np.float32,
-    )
-
-    for parent_idx, child_idx in unique_edges:
-        out_degree[parent_idx] += 1.0
-        in_degree[child_idx] += 1.0
-
-    # ------------------------------------------------------------------
-    # Subtree size.
-    #
-    # We calculate this on the BFS tree rather than recursively walking
-    # arbitrary cyclic edges.
-    # ------------------------------------------------------------------
 
     bfs_parent = np.full(
-        num_nodes,
+        len(node_list),
         -1,
         dtype=np.int64,
     )
 
-    bfs_order = [root_idx]
-    visited = {root_idx}
+    for node in bfs_order:
+        for child in adjacency[node]:
 
-    queue = deque([root_idx])
-
-    while queue:
-        current = queue.popleft()
-
-        for child in adjacency[current]:
-            if child in visited:
+            if child == root_idx:
                 continue
 
-            visited.add(child)
-            bfs_parent[child] = current
-            bfs_order.append(child)
-            queue.append(child)
+            if bfs_parent[child] != -1:
+                continue
 
-    subtree_size = np.ones(
-        num_nodes,
-        dtype=np.float32,
-    )
+            bfs_parent[child] = node
 
-    for node_idx in reversed(bfs_order):
-        parent_idx = bfs_parent[node_idx]
+    for node in reversed(bfs_order):
 
-        if parent_idx >= 0:
-            subtree_size[parent_idx] += subtree_size[node_idx]
+        parent = bfs_parent[node]
 
-    # ------------------------------------------------------------------
-    # Normalize graph statistics.
-    # ------------------------------------------------------------------
+        if parent >= 0:
+            subtree_size[parent] += (
+                subtree_size[node]
+            )
 
-    max_delay = float(np.max(delays))
+    # ---------------------------------------------------------------
+    # Normalize features.
+    # ---------------------------------------------------------------
+
+    max_delay = float(delays.max())
 
     if max_delay > 0:
-        normalized_delay = delays / max_delay
+        normalized_delay = (
+            delays / max_delay
+        )
+
         normalized_log_delay = (
-            np.log1p(delays) /
-            np.log1p(max_delay)
+            np.log1p(delays)
+            / np.log1p(max_delay)
         )
     else:
-        normalized_delay = np.zeros_like(delays)
-        normalized_log_delay = np.zeros_like(delays)
+        normalized_delay = np.zeros_like(
+            delays
+        )
 
-    max_depth = float(np.max(depth))
+        normalized_log_delay = np.zeros_like(
+            delays
+        )
+
+    max_depth = float(depth.max())
 
     if max_depth > 0:
-        normalized_depth = depth / max_depth
+        normalized_depth = (
+            depth / max_depth
+        )
     else:
-        normalized_depth = np.zeros_like(depth)
+        normalized_depth = np.zeros_like(
+            depth
+        )
 
-    max_in_degree = float(np.max(in_degree))
+    max_in = float(incoming.max())
 
-    if max_in_degree > 0:
+    if max_in > 0:
         normalized_in_degree = (
-            in_degree / max_in_degree
+            incoming / max_in
         )
     else:
-        normalized_in_degree = np.zeros_like(in_degree)
+        normalized_in_degree = np.zeros_like(
+            incoming
+        )
 
-    max_out_degree = float(np.max(out_degree))
+    max_out = float(outgoing.max())
 
-    if max_out_degree > 0:
+    if max_out > 0:
         normalized_out_degree = (
-            out_degree / max_out_degree
+            outgoing / max_out
         )
     else:
-        normalized_out_degree = np.zeros_like(out_degree)
+        normalized_out_degree = np.zeros_like(
+            outgoing
+        )
 
-    max_subtree = float(np.max(subtree_size))
+    max_subtree = float(
+        subtree_size.max()
+    )
 
     if max_subtree > 0:
         normalized_subtree = (
             subtree_size / max_subtree
         )
     else:
-        normalized_subtree = np.zeros_like(subtree_size)
+        normalized_subtree = np.zeros_like(
+            subtree_size
+        )
 
     root_indicator = np.zeros(
-        num_nodes,
+        len(node_list),
         dtype=np.float32,
     )
 
     root_indicator[root_idx] = 1.0
 
     leaf_indicator = (
-        out_degree == 0
+        outgoing == 0
     ).astype(np.float32)
 
-    # ------------------------------------------------------------------
-    # Final node feature matrix.
+    # ---------------------------------------------------------------
+    # Final 8-dimensional node representation.
     #
-    # Feature order:
-    #   0: normalized delay
-    #   1: normalized log delay
-    #   2: normalized depth
-    #   3: normalized in-degree
-    #   4: normalized out-degree
-    #   5: normalized subtree size
-    #   6: root indicator
-    #   7: leaf indicator
-    # ------------------------------------------------------------------
+    # 0: normalized delay
+    # 1: normalized log delay
+    # 2: normalized depth
+    # 3: normalized in-degree
+    # 4: normalized out-degree
+    # 5: normalized subtree size
+    # 6: root indicator
+    # 7: leaf indicator
+    # ---------------------------------------------------------------
 
     node_features = np.stack(
         [
@@ -419,45 +409,54 @@ def parse_tree_file(path: str | Path) -> dict:
         axis=1,
     ).astype(np.float32)
 
-    # ------------------------------------------------------------------
+    # ---------------------------------------------------------------
     # Edge index.
-    # ------------------------------------------------------------------
+    # ---------------------------------------------------------------
 
     if unique_edges:
-        sorted_edges = sorted(unique_edges)
 
         edge_index = np.asarray(
-            sorted_edges,
+            sorted(unique_edges),
             dtype=np.int64,
         ).T
 
     else:
+
         edge_index = np.empty(
             (2, 0),
             dtype=np.int64,
         )
 
-    # ------------------------------------------------------------------
-    # Final safety checks.
-    # ------------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # Safety.
+    # ---------------------------------------------------------------
 
     if node_features.shape != (
-        num_nodes,
+        len(node_list),
         NODE_FEATURE_DIM,
     ):
         raise ValueError(
-            f"Invalid node feature shape: "
-            f"{node_features.shape}"
+            f"Invalid node feature shape "
+            f"{node_features.shape} in {path}"
         )
 
-    if not np.all(np.isfinite(node_features)):
+    if not np.all(
+        np.isfinite(node_features)
+    ):
         raise ValueError(
-            f"Non-finite node features found in {path}"
+            f"Non-finite node features in {path}"
         )
 
-    if not np.all(np.isfinite(delays)):
+    if not np.all(
+        np.isfinite(delays)
+    ):
         raise ValueError(
-            f"Non-finite delays found in {path}"
+            f"Non-finite delays in {path}"
+        )
+
+    if np.any(delays < 0):
+        raise ValueError(
+            f"Negative delay remained in {path}"
         )
 
     return {
@@ -465,7 +464,7 @@ def parse_tree_file(path: str | Path) -> dict:
         "edge_index": edge_index,
         "delays": delays,
         "depth": depth,
-        "num_nodes": num_nodes,
+        "num_nodes": len(node_list),
         "num_edges": edge_index.shape[1],
         "root": root,
     }
@@ -475,9 +474,6 @@ def load_propagation_tree(
     tree_dir: str | Path,
     tweet_id: str,
 ) -> dict:
-    """
-    Load a propagation tree by source tweet ID.
-    """
 
     tree_dir = Path(tree_dir)
 
