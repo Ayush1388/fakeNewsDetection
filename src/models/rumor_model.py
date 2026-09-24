@@ -29,7 +29,7 @@ class PropagationFusion(nn.Module):
         graph_dim=256,
         temporal_dim=256,
         fusion_dim=256,
-        dropout=0.2,
+        dropout=0.3,
     ):
         super().__init__()
 
@@ -221,8 +221,8 @@ class PropagationRumorModel(nn.Module):
         feature_dim=256,
         temporal_dim=256,
         fusion_dim=256,
-        dropout=0.2,
-        freeze_layers=4,
+        dropout=0.3,
+        freeze_layers=8,
     ):
         super().__init__()
 

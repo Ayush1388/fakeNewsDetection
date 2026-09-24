@@ -187,36 +187,57 @@ class GraphAttentionLayer(nn.Module):
         )
 
         # ---------------------------------------------------------
-        # Stable edge-wise softmax.
+        # Stable edge-wise softmax, vectorized.
         #
-        # Softmax is also explicitly performed in float32.
+        # This used to loop over every node in Python
+        # (`for node in range(num_nodes)`), which is O(num_nodes *
+        # num_edges) and became a serious bottleneck (and a plausible
+        # cause of apparent training "hangs") on the larger
+        # propagation trees in this dataset, some of which have
+        # hundreds of nodes. It's replaced with a scatter-based
+        # per-destination-node softmax that does the exact same
+        # computation (max subtraction per destination node per
+        # head, then softmax over incoming edges) in O(num_edges),
+        # with no Python-level loop.
+        #
+        # Softmax is still explicitly performed in float32.
         # ---------------------------------------------------------
 
-        attention = torch.zeros_like(
-            scores,
+        dst_expanded = dst_all.unsqueeze(-1).expand(-1, self.heads)
+
+        max_per_dst = torch.full(
+            (num_nodes, self.heads),
+            float("-inf"),
             dtype=torch.float32,
+            device=x.device,
         )
 
-        for node in range(num_nodes):
-            mask = dst_all == node
+        max_per_dst.scatter_reduce_(
+            0,
+            dst_expanded,
+            scores,
+            reduce="amax",
+            include_self=True,
+        )
 
-            if mask.any():
-                node_scores = scores[mask]
+        # Every node has a self-loop, so every row of max_per_dst is
+        # guaranteed to have been written at least once (no -inf
+        # rows survive to the subtraction below).
+        scores_shifted = scores - max_per_dst.gather(0, dst_expanded)
 
-                # Explicit max subtraction gives us an additional
-                # numerical-stability safeguard.
-                node_scores = (
-                    node_scores
-                    - node_scores.max(
-                        dim=0,
-                        keepdim=True,
-                    ).values
-                )
+        exp_scores = torch.exp(scores_shifted)
 
-                attention[mask] = F.softmax(
-                    node_scores,
-                    dim=0,
-                )
+        sum_per_dst = torch.zeros(
+            (num_nodes, self.heads),
+            dtype=torch.float32,
+            device=x.device,
+        )
+
+        sum_per_dst.index_add_(0, dst_all, exp_scores)
+
+        attention = exp_scores / (
+            sum_per_dst.gather(0, dst_expanded) + 1e-16
+        )
 
         # ---------------------------------------------------------
         # Message passing.

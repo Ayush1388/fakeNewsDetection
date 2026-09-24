@@ -113,7 +113,7 @@ def build_model(
             feature_dim=256,
             temporal_dim=256,
             fusion_dim=256,
-            dropout=0.2,
+            dropout=0.3,
             freeze_layers=freeze_layers,
         )
 
@@ -192,15 +192,24 @@ def main(argv=None):
     parser.add_argument("--grad-accum-steps", type=int, default=2)
 
     parser.add_argument("--backbone-lr", type=float, default=1e-5)
-    parser.add_argument("--head-lr", type=float, default=1e-4)
-    parser.add_argument("--weight-decay", type=float, default=0.01)
+    parser.add_argument("--head-lr", type=float, default=5e-5)
+    parser.add_argument("--weight-decay", type=float, default=0.02)
     parser.add_argument("--warmup-ratio", type=float, default=0.1)
 
     parser.add_argument("--label-smoothing", type=float, default=0.1)
     parser.add_argument("--use-class-weights", action="store_true", default=True)
     parser.add_argument("--no-class-weights", dest="use_class_weights", action="store_false")
 
-    parser.add_argument("--freeze-layers", type=int, default=4)
+    # A first tegfnd run (text + linguistic features only, no
+    # propagation graph) on Twitter15 hit Train F1 0.99 vs Val F1
+    # 0.72 by epoch 13-15 -- a textbook small-dataset transformer
+    # overfit (DeBERTa-v3-base is ~86M parameters against ~1043
+    # training examples). freeze_layers=4 was not nearly enough to
+    # control that gap, so the default is raised to 8 (of
+    # deberta-v3-base's 12 encoder layers, leaving only the top 4 +
+    # the task heads trainable). See README for why --model
+    # propagation is the bigger lever here.
+    parser.add_argument("--freeze-layers", type=int, default=8)
     parser.add_argument("--patience", type=int, default=5)
 
     parser.add_argument("--max-length", type=int, default=192)

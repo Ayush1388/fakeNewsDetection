@@ -10,7 +10,7 @@ class DeBERTaBaseline(nn.Module):
         self,
         num_classes,
         model_name="microsoft/deberta-v3-base",
-        dropout=0.2,
+        dropout=0.3,
         freeze_layers=4,
     ):
         super().__init__()

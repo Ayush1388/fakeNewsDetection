@@ -19,7 +19,7 @@ class TEGFND(nn.Module):
         fusion_dim=256,
         expert_dim=256,
         num_experts=4,
-        dropout=0.2,
+        dropout=0.3,
         freeze_layers=4,
         moe_aux_loss_weight=0.01,
     ):
