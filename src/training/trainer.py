@@ -48,6 +48,16 @@ class Trainer:
         self.patience = patience
         self.aux_loss_key = aux_loss_key
 
+        # A "last" checkpoint (every epoch) alongside the "best"
+        # checkpoint (only on val-F1 improvement), so a run that
+        # gets interrupted/hangs mid-training (e.g. a cloud-notebook
+        # GPU hiccup) can always resume from wherever it actually
+        # got to, not just from the last improving epoch.
+        if save_path.endswith(".pt"):
+            self.last_checkpoint_path = save_path[: -len(".pt")] + "_last.pt"
+        else:
+            self.last_checkpoint_path = save_path + ".last"
+
         self.use_amp = self.device.type == "cuda"
 
         if self.use_amp:
@@ -227,13 +237,72 @@ class Trainer:
 
         return average_loss, epoch_f1, epoch_accuracy
 
+    def _save_checkpoint(self, epoch, val_f1, val_accuracy, path=None):
+        checkpoint = {
+            "model_state_dict": self.model.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "epoch": epoch,
+            "val_f1": val_f1,
+            "val_accuracy": val_accuracy,
+        }
+
+        if self.scheduler is not None:
+            checkpoint["scheduler_state_dict"] = self.scheduler.state_dict()
+
+        torch.save(checkpoint, path or self.save_path)
+
+    @staticmethod
+    def load_checkpoint(
+        path,
+        model,
+        optimizer=None,
+        scheduler=None,
+        device="cpu",
+    ):
+        """
+        Load a checkpoint saved by ``_save_checkpoint`` and restore
+        model/optimizer/scheduler state in place. Returns
+        ``(next_epoch, best_val_f1)`` to pass straight into
+        ``fit(start_epoch=..., best_val_f1=...)``.
+        """
+
+        checkpoint = torch.load(path, map_location=device)
+
+        model.load_state_dict(checkpoint["model_state_dict"])
+
+        if optimizer is not None and "optimizer_state_dict" in checkpoint:
+            optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+
+        if (
+            scheduler is not None
+            and "scheduler_state_dict" in checkpoint
+        ):
+            scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+
+        next_epoch = checkpoint.get("epoch", 0) + 1
+        best_val_f1 = checkpoint.get("val_f1", -float("inf"))
+
+        return next_epoch, best_val_f1
+
     def fit(
         self,
         train_loader,
         validation_loader,
         epochs,
+        start_epoch=1,
+        best_val_f1=-float("inf"),
     ):
-        best_val_f1 = -float("inf")
+        """
+        ``start_epoch`` / ``best_val_f1`` let training resume from a
+        previously saved checkpoint (see ``load_checkpoint`` /
+        ``scripts/train.py --resume``) instead of always starting
+        cold from epoch 1. ``epochs_without_improvement`` is
+        intentionally reset to 0 on resume: we don't know how many
+        non-improving epochs preceded the checkpoint, and resetting
+        is the safe direction (worst case a couple of extra epochs
+        before early stopping, rather than stopping immediately).
+        """
+
         epochs_without_improvement = 0
 
         history = {
@@ -251,7 +320,7 @@ class Trainer:
         )
 
         for epoch in range(
-            1,
+            start_epoch,
             epochs + 1,
         ):
             print(
@@ -291,22 +360,18 @@ class Trainer:
                 f"| Val Acc: {val_accuracy:.4f}"
             )
 
+            # Always persist a "last" checkpoint so an interrupted or
+            # hung run can resume from here even if this epoch
+            # wasn't a new best.
+            self._save_checkpoint(
+                epoch, val_f1, val_accuracy, path=self.last_checkpoint_path,
+            )
+
             if val_f1 > best_val_f1:
                 best_val_f1 = val_f1
                 epochs_without_improvement = 0
 
-                torch.save(
-                    {
-                        "model_state_dict":
-                            self.model.state_dict(),
-                        "optimizer_state_dict":
-                            self.optimizer.state_dict(),
-                        "epoch": epoch,
-                        "val_f1": val_f1,
-                        "val_accuracy": val_accuracy,
-                    },
-                    self.save_path,
-                )
+                self._save_checkpoint(epoch, val_f1, val_accuracy)
 
                 print(
                     "Saved best checkpoint: "
