@@ -1,18 +1,43 @@
-TEG-FND v1.0 (FINAL CODE CONTRACT)
+TEG-FND v2.0 (FINAL CODE CONTRACT)
 
-Available data: source tweet/claim text + labels. Twitter15/Twitter16 supplied files do not contain propagation edges/timestamps, so no graph values are fabricated.
+Available data: source tweet/claim text + labels. Twitter15/Twitter16 also
+ship propagation trees under data/<dataset>/tree/ (parent -> child edges,
+relative timestamps), consumed by the `propagation` model variant only.
 
-Pipeline:
-source text -> DeBERTa-v3 -> attention pooling -> semantic projection
+Pipeline (tegfnd, default):
+source text -> DeBERTa-v3 (embeddings + first `freeze_layers` layers frozen)
+            -> multi-view pooling (attention + mean + max, concatenated
+               and projected back to hidden_size)
+            -> semantic projection
                                       \
-                                       cross-view attention -> adaptive MoE -> veracity + uncertainty
+linguistic text-structure features (22-d stylometric vector)
+     -> FeatureEncoder
+                                      \
+                                       cross-view attention -> adaptive MoE
+                                       (+ load-balancing auxiliary loss)
+                                       -> veracity + uncertainty
                                       /
-                 deterministic text-structure auxiliary view
+
+Pipeline (propagation): adds a graph-attention propagation-tree encoder and
+a temporal-delay encoder, fused with the text/linguistic views via a 4-way
+gated cross-attention fusion (src/models/rumor_model.py).
 
 Tasks:
 Twitter15/16: 4-class (non-rumor, true, false, unverified)
 PolitiFact: 6-class (pants-fire, false, mostly-false, half-true, mostly-true, true)
 
-Split: stratified 70/15/15. Model selection uses validation Macro-F1 only. Final test is evaluated after checkpoint selection.
+Split: stratified 70/15/15 (sklearn train_test_split(stratify=...), applied
+identically in scripts/train.py and scripts/evaluate.py). Model selection
+uses validation Macro-F1 with early stopping (patience). Final test is
+evaluated after checkpoint selection.
 
-A real propagation graph can later be attached behind graph_utils.py without changing the data/model/training interfaces, but it is not part of reported results until actual edge/timestamp data is supplied.
+Optimization: linear-warmup + linear-decay LR schedule stepped per
+optimizer step; differential learning rate (lower for the pretrained
+backbone, higher for randomly-initialized heads); no weight decay on
+bias/LayerNorm params; label smoothing + inverse-frequency class weights
+in the loss; gradient accumulation for a larger effective batch size.
+
+A real propagation graph can later be attached behind graph_utils.py
+without changing the data/model/training interfaces for the `tegfnd`
+variant; the `propagation` variant already consumes the tree data that
+ships with Twitter15/Twitter16.
