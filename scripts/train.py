@@ -208,6 +208,20 @@ def main(argv=None):
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--save-path", type=str, default=None)
 
+    parser.add_argument(
+        "--resume",
+        type=str,
+        default=None,
+        help=(
+            "Path to a checkpoint to resume from (either the "
+            "'*_last.pt' checkpoint saved every epoch, or a "
+            "'best' checkpoint). Restores model/optimizer/"
+            "scheduler state and continues from the next epoch. "
+            "--epochs should be the ORIGINAL total epoch budget "
+            "(e.g. still 15, not 'epochs remaining')."
+        ),
+    )
+
     args = parser.parse_args(argv)
 
     # --------------------------------------------------
@@ -444,6 +458,36 @@ def main(argv=None):
     )
 
     # --------------------------------------------------
+    # Resume from a checkpoint, if requested.
+    # --------------------------------------------------
+
+    start_epoch = 1
+    best_val_f1 = -float("inf")
+
+    if args.resume is not None:
+        print(f"Resuming from checkpoint: {args.resume}")
+
+        start_epoch, best_val_f1 = Trainer.load_checkpoint(
+            args.resume,
+            model=model,
+            optimizer=optimizer,
+            scheduler=scheduler,
+            device=device,
+        )
+
+        print(
+            f"Resuming at epoch {start_epoch}/{args.epochs} "
+            f"(best val F1 so far: {best_val_f1:.4f})"
+        )
+
+        if start_epoch > args.epochs:
+            raise ValueError(
+                f"Checkpoint is already past --epochs={args.epochs} "
+                f"(checkpoint epoch={start_epoch - 1}). Increase "
+                "--epochs to continue training."
+            )
+
+    # --------------------------------------------------
     # Training
     # --------------------------------------------------
 
@@ -451,6 +495,8 @@ def main(argv=None):
         train_loader=train_loader,
         validation_loader=val_loader,
         epochs=args.epochs,
+        start_epoch=start_epoch,
+        best_val_f1=best_val_f1,
     )
 
     # --------------------------------------------------
