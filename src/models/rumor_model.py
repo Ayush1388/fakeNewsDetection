@@ -7,6 +7,7 @@ from .text_encoder import TextEncoder
 from .feature_encoder import FeatureEncoder
 from .graph_encoder import GraphEncoder
 from .temporal_encoder import TemporalEncoder
+from ..data.features import NUM_LINGUISTIC_FEATURES
 
 
 class PropagationFusion(nn.Module):
@@ -215,12 +216,13 @@ class PropagationRumorModel(nn.Module):
         self,
         num_classes,
         model_name="microsoft/deberta-v3-base",
-        linguistic_dim=14,
+        linguistic_dim=NUM_LINGUISTIC_FEATURES,
         graph_input_dim=8,
         feature_dim=256,
         temporal_dim=256,
         fusion_dim=256,
         dropout=0.2,
+        freeze_layers=4,
     ):
         super().__init__()
 
@@ -231,6 +233,7 @@ class PropagationRumorModel(nn.Module):
         self.text_encoder = TextEncoder(
             model_name=model_name,
             dropout=dropout,
+            freeze_layers=freeze_layers,
         )
 
         # --------------------------------------------------

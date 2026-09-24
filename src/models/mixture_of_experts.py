@@ -62,6 +62,30 @@ class AdaptiveMixtureOfExperts(nn.Module):
 
         self.output_dim = expert_dim
 
+    @staticmethod
+    def load_balancing_loss(gate_weights):
+        """
+        Coefficient-of-variation load-balancing loss.
+
+        Vanilla soft-gated MoE has no pressure to actually use all
+        experts: the gate can collapse onto a single expert early
+        in training, wasting the extra capacity the architecture
+        was meant to provide. Penalizing the squared coefficient of
+        variation of each expert's average gate weight across the
+        batch encourages the router to spread load across experts,
+        which is the standard fix used in sparsely/softly gated
+        MoE models (e.g. Shazeer et al., 2017).
+        """
+
+        importance = gate_weights.sum(dim=0)
+
+        mean = importance.mean()
+        var = importance.var(unbiased=False)
+
+        cv_squared = var / (mean ** 2 + 1e-10)
+
+        return cv_squared
+
     def forward(self, x):
 
         expert_outputs = torch.stack(
@@ -85,4 +109,6 @@ class AdaptiveMixtureOfExperts(nn.Module):
             dim=1,
         )
 
-        return self.output_norm(output), gate_weights
+        aux_loss = self.load_balancing_loss(gate_weights)
+
+        return self.output_norm(output), gate_weights, aux_loss

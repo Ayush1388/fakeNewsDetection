@@ -1,11 +1,29 @@
 import os
 
 import torch
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score
 from tqdm import tqdm
 
 
+# Keys that describe the target / bookkeeping rather than a model
+# input, so they must never be forwarded into model(**kwargs).
+NON_MODEL_KEYS = {"labels", "ids", "texts", "id", "text", "label"}
+
+
 class Trainer:
+    """
+    Generic trainer.
+
+    Earlier versions of this trainer hardcoded the propagation-model
+    batch layout (``node_features`` / ``edge_index`` / ``delays``),
+    which meant it silently crashed (KeyError) on any batch produced
+    by the plain ``FakeNewsDataset`` used by the DeBERTa baseline and
+    TEG-FND models. The trainer now builds its model kwargs directly
+    from whatever keys a batch actually contains, so it works
+    unchanged for all three model variants (deberta / tegfnd /
+    propagation).
+    """
+
     def __init__(
         self,
         model,
@@ -15,6 +33,9 @@ class Trainer:
         save_path,
         scheduler=None,
         max_grad_norm=1.0,
+        grad_accum_steps=1,
+        patience=5,
+        aux_loss_key="aux_loss",
     ):
         self.model = model
         self.optimizer = optimizer
@@ -23,6 +44,9 @@ class Trainer:
         self.save_path = save_path
         self.scheduler = scheduler
         self.max_grad_norm = max_grad_norm
+        self.grad_accum_steps = max(1, grad_accum_steps)
+        self.patience = patience
+        self.aux_loss_key = aux_loss_key
 
         self.use_amp = self.device.type == "cuda"
 
@@ -35,91 +59,52 @@ class Trainer:
             self.scaler = None
 
     def _move_batch_to_device(self, batch):
-        input_ids = batch["input_ids"].to(
-            self.device,
-            non_blocking=True,
-        )
+        model_kwargs = {}
+        labels = None
 
-        attention_mask = batch["attention_mask"].to(
-            self.device,
-            non_blocking=True,
-        )
+        for key, value in batch.items():
 
-        linguistic_features = batch[
-            "linguistic_features"
-        ].to(
-            self.device,
-            non_blocking=True,
-        )
+            if key == "labels":
+                labels = value.to(self.device, non_blocking=True)
+                continue
 
-        labels = batch["labels"].to(
-            self.device,
-            non_blocking=True,
-        )
+            if key in NON_MODEL_KEYS:
+                continue
 
-        node_features = [
-            nodes.to(
-                self.device,
-                non_blocking=True,
-            )
-            for nodes in batch["node_features"]
-        ]
+            if torch.is_tensor(value):
+                model_kwargs[key] = value.to(
+                    self.device,
+                    non_blocking=True,
+                )
+            elif isinstance(value, (list, tuple)) and value and torch.is_tensor(value[0]):
+                model_kwargs[key] = [
+                    item.to(self.device, non_blocking=True)
+                    for item in value
+                ]
+            else:
+                model_kwargs[key] = value
 
-        edge_index = [
-            edges.to(
-                self.device,
-                non_blocking=True,
-            )
-            for edges in batch["edge_index"]
-        ]
-
-        delays = [
-            delay.to(
-                self.device,
-                non_blocking=True,
-            )
-            for delay in batch["delays"]
-        ]
-
-        return (
-            input_ids,
-            attention_mask,
-            linguistic_features,
-            node_features,
-            edge_index,
-            delays,
-            labels,
-        )
+        return model_kwargs, labels
 
     def _forward_loss(self, batch):
-        (
-            input_ids,
-            attention_mask,
-            linguistic_features,
-            node_features,
-            edge_index,
-            delays,
-            labels,
-        ) = self._move_batch_to_device(batch)
+        model_kwargs, labels = self._move_batch_to_device(batch)
 
         with torch.autocast(
             device_type="cuda",
             dtype=torch.float16,
             enabled=self.use_amp,
         ):
-            output = self.model(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                linguistic_features=linguistic_features,
-                node_features=node_features,
-                edge_index=edge_index,
-                delays=delays,
-            )
+            output = self.model(**model_kwargs)
 
             loss = self.criterion(
                 output["logits"],
                 labels,
             )
+
+            aux_loss = output.get(self.aux_loss_key)
+
+            if aux_loss is not None:
+                loss = loss + aux_loss
 
         return loss, output, labels
 
@@ -142,51 +127,50 @@ class Trainer:
             desc="Train" if training else "Val",
         )
 
-        for batch in progress:
-            if training:
-                self.optimizer.zero_grad(
-                    set_to_none=True
-                )
+        if training:
+            self.optimizer.zero_grad(set_to_none=True)
 
-                loss, output, labels = (
-                    self._forward_loss(batch)
-                )
+        for step, batch in enumerate(progress):
+
+            if training:
+                loss, output, labels = self._forward_loss(batch)
+
+                scaled_loss = loss / self.grad_accum_steps
 
                 if self.use_amp:
-                    self.scaler.scale(
-                        loss
-                    ).backward()
-
-                    self.scaler.unscale_(
-                        self.optimizer
-                    )
-
-                    torch.nn.utils.clip_grad_norm_(
-                        self.model.parameters(),
-                        self.max_grad_norm,
-                    )
-
-                    self.scaler.step(
-                        self.optimizer
-                    )
-
-                    self.scaler.update()
-
+                    self.scaler.scale(scaled_loss).backward()
                 else:
-                    loss.backward()
+                    scaled_loss.backward()
+
+                is_accum_boundary = (
+                    (step + 1) % self.grad_accum_steps == 0
+                    or (step + 1) == len(loader)
+                )
+
+                if is_accum_boundary:
+
+                    if self.use_amp:
+                        self.scaler.unscale_(self.optimizer)
 
                     torch.nn.utils.clip_grad_norm_(
                         self.model.parameters(),
                         self.max_grad_norm,
                     )
 
-                    self.optimizer.step()
+                    if self.use_amp:
+                        self.scaler.step(self.optimizer)
+                        self.scaler.update()
+                    else:
+                        self.optimizer.step()
+
+                    self.optimizer.zero_grad(set_to_none=True)
+
+                    if self.scheduler is not None:
+                        self.scheduler.step()
 
             else:
                 with torch.no_grad():
-                    loss, output, labels = (
-                        self._forward_loss(batch)
-                    )
+                    loss, output, labels = self._forward_loss(batch)
 
             if not torch.isfinite(loss):
                 raise RuntimeError(
@@ -236,7 +220,12 @@ class Trainer:
             zero_division=0,
         )
 
-        return average_loss, epoch_f1
+        epoch_accuracy = accuracy_score(
+            all_labels,
+            all_predictions,
+        )
+
+        return average_loss, epoch_f1, epoch_accuracy
 
     def fit(
         self,
@@ -245,9 +234,19 @@ class Trainer:
         epochs,
     ):
         best_val_f1 = -float("inf")
+        epochs_without_improvement = 0
+
+        history = {
+            "train_loss": [],
+            "train_f1": [],
+            "train_accuracy": [],
+            "val_loss": [],
+            "val_f1": [],
+            "val_accuracy": [],
+        }
 
         os.makedirs(
-            os.path.dirname(self.save_path),
+            os.path.dirname(self.save_path) or ".",
             exist_ok=True,
         )
 
@@ -259,35 +258,42 @@ class Trainer:
                 f"\nEpoch {epoch}/{epochs}"
             )
 
-            train_loss, train_f1 = (
+            train_loss, train_f1, train_accuracy = (
                 self._run_epoch(
                     train_loader,
                     training=True,
                 )
             )
 
-            val_loss, val_f1 = (
+            val_loss, val_f1, val_accuracy = (
                 self._run_epoch(
                     validation_loader,
                     training=False,
                 )
             )
 
-            if self.scheduler is not None:
-                self.scheduler.step()
+            history["train_loss"].append(train_loss)
+            history["train_f1"].append(train_f1)
+            history["train_accuracy"].append(train_accuracy)
+            history["val_loss"].append(val_loss)
+            history["val_f1"].append(val_f1)
+            history["val_accuracy"].append(val_accuracy)
 
             print(
                 f"Train Loss: {train_loss:.4f} "
-                f"| Train F1: {train_f1:.4f}"
+                f"| Train F1: {train_f1:.4f} "
+                f"| Train Acc: {train_accuracy:.4f}"
             )
 
             print(
                 f"Val Loss: {val_loss:.4f} "
-                f"| Val F1: {val_f1:.4f}"
+                f"| Val F1: {val_f1:.4f} "
+                f"| Val Acc: {val_accuracy:.4f}"
             )
 
             if val_f1 > best_val_f1:
                 best_val_f1 = val_f1
+                epochs_without_improvement = 0
 
                 torch.save(
                     {
@@ -297,6 +303,7 @@ class Trainer:
                             self.optimizer.state_dict(),
                         "epoch": epoch,
                         "val_f1": val_f1,
+                        "val_accuracy": val_accuracy,
                     },
                     self.save_path,
                 )
@@ -305,3 +312,24 @@ class Trainer:
                     "Saved best checkpoint: "
                     f"{self.save_path}"
                 )
+            else:
+                epochs_without_improvement += 1
+
+                print(
+                    "No val F1 improvement for "
+                    f"{epochs_without_improvement} epoch(s)."
+                )
+
+                if (
+                    self.patience is not None
+                    and epochs_without_improvement >= self.patience
+                ):
+                    print(
+                        "Early stopping triggered "
+                        f"(patience={self.patience})."
+                    )
+                    break
+
+        history["best_val_f1"] = best_val_f1
+
+        return history
