@@ -11,12 +11,14 @@ class DeBERTaBaseline(nn.Module):
         num_classes,
         model_name="microsoft/deberta-v3-base",
         dropout=0.2,
+        freeze_layers=4,
     ):
         super().__init__()
 
         self.text_encoder = TextEncoder(
             model_name=model_name,
             dropout=dropout,
+            freeze_layers=freeze_layers,
         )
 
         self.classifier = nn.Sequential(
