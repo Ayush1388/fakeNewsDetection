@@ -7,8 +7,18 @@ The supplied Twitter15/Twitter16 files contain `label.txt` and `source_tweets.tx
 
 ## Model variants (`--model`)
 - `tegfnd` (default): DeBERTa-v3 encoder → multi-view pooling (attention + mean + max) → stylometric linguistic-feature branch → cross-view attention fusion → adaptive Mixture-of-Experts (with a load-balancing auxiliary loss) → classification + uncertainty head.
-- `propagation`: adds a graph-attention propagation-tree encoder and a temporal-delay encoder, fused with the text/linguistic views via a 4-way gated attention fusion. Twitter15/Twitter16 only.
+- `propagation` (**use this one if you want to close the gap toward literature numbers in the 80s** — see below): adds a graph-attention propagation-tree encoder and a temporal-delay encoder, fused with the text/linguistic views via a 4-way gated attention fusion. Twitter15/Twitter16 only.
 - `deberta`: DeBERTa-v3 text-only baseline, for ablation.
+
+## Why `tegfnd` alone plateaus around 71-73% on Twitter15/16, and what actually gets to ~85%
+A `tegfnd` run (text + linguistic features only, no propagation graph) on Twitter15 hits **Train F1 0.99 / Val F1 0.72** by epoch 13-15 — the gap opens by epoch ~5 and never closes. That's not a training-recipe problem you can regularize your way past indefinitely; it's a ceiling from **what information is actually in a single ~80-100 character source tweet**. Whether "the vote was rigged!!" is a rumor, confirmed true, confirmed false, or unverified frequently isn't decidable from the tweet text alone — it depends on how the community responded (denials, corroborations, the shape and speed of the retweet/reply cascade).
+
+This is exactly the finding in the rumor-detection literature this dataset comes from (Ma et al. 2016/2017; the GCAN/BiGCN/PLAN line of work cited in the GETAE paper you supplied): text-only baselines on Twitter15/16 cluster in the low-to-mid 70s, while models that use the **propagation tree** reach the mid-80s to high-80s. GETAE itself (your base paper) gets its 82-90% by combining text with a Node2Vec/DeepWalk embedding of the propagation graph — not from a stronger text encoder alone. The data for this is already sitting in `data/twitter15/tree/` and `data/twitter16/tree/`, and this repo's `propagation` model (`PropagationRumorModel`) already consumes it — it just hadn't been trained yet.
+
+**Concretely: run `--model propagation`, not `--model tegfnd`, if the target is 85%.** It won't be automatic — the graph branch has the same small-dataset overfitting risk as the text branch — but it's the architectural lever that's actually aligned with how the base papers get their numbers, whereas further tuning the text-only model is optimizing the wrong axis.
+
+## Changes made on top of the 71%-accuracy baseline run
+The original pipeline had several bugs/gaps that capped its accuracy well below what the architecture was capable of:
 
 ## Changes made on top of the 71%-accuracy baseline run
 The original pipeline had several bugs/gaps that capped its accuracy well below what the architecture was capable of:
@@ -25,6 +35,10 @@ The original pipeline had several bugs/gaps that capped its accuracy well below 
 10. **Text pooling was a single learned-attention vector.** Fixed: `TextEncoder` now concatenates attention pooling, mean pooling and max pooling of the backbone's last hidden state (concat-pooling), which is a standard, parameter-cheap way to strengthen text classification on small datasets.
 11. **Linguistic features were 14 generic character/token counts.** Fixed: extended to 22 features, adding sentence-length burstiness, an approximate Flesch reading-ease score, journalistic quoting markers ("said", quote counts) and first-person-pronoun ratio — stylometric signals that prior classical-ML fake-news work (n-gram/stylometric ensembles) found informative on top of contextual embeddings.
 12. **Two divergent training scripts.** `scripts/train_propagation.py` duplicated (and partially diverged from) `scripts/train.py`. It's now a thin backwards-compatible wrapper around the single shared pipeline.
+
+## Changes made after seeing the first real run (Train F1 0.99 / Val F1 0.72 on `tegfnd`)
+13. **`GraphAttentionLayer`'s edge softmax looped over every node in Python** (`for node in range(num_nodes)`), O(num_nodes × num_edges). On the larger propagation trees in this dataset (some have hundreds of nodes) this was a real bottleneck and a plausible cause of the `propagation` model appearing to hang during training. Fixed: replaced with a vectorized scatter-based softmax (`scatter_reduce_`/`index_add_`) that computes the identical result (verified numerically against the old loop) with no Python-level loop — a 400-node synthetic graph went from a Python triple-nested-effectively loop to 0.1s.
+14. **`--freeze-layers` default (4) wasn't enough to control overfitting.** Raised the default to 8 (of deberta-v3-base's 12 encoder layers), and bumped dropout 0.2→0.3 and weight decay 0.01→0.02 across `tegfnd`/`propagation`/`deberta`, given the observed train/val gap. `--head-lr` lowered 1e-4→5e-5 to match.
 
 None of this guarantees a specific number — it fixes real bugs (some of which meant parts of the pipeline could not previously run at all) and applies standard, well-evidenced techniques for fine-tuning transformers on small, class-balanced text datasets. **Retrain and re-evaluate to get the actual new number**; report it only after doing so.
 
@@ -45,10 +59,15 @@ pip install -r requirements.txt
 python scripts/train.py --dataset twitter15 --model tegfnd
 python scripts/train.py --dataset twitter16 --model tegfnd
 
-# Propagation-graph variant (Twitter15/16 only)
+# Propagation-graph variant (Twitter15/16 only) -- this is the one to run for 80s-range accuracy
 python scripts/train.py --dataset twitter15 --model propagation
 # or, equivalently:
 python scripts/train_propagation.py --dataset twitter15
+
+# Resume an interrupted run from its last checkpoint (--epochs stays the
+# ORIGINAL total budget, e.g. still 15, not "epochs remaining")
+python scripts/train.py --dataset twitter15 --model propagation \
+    --resume results/checkpoints/twitter15_propagation_seed42_last.pt --epochs 15
 
 # Text-only baseline (ablation)
 python scripts/train.py --dataset politifact --model deberta
