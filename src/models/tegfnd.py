@@ -5,6 +5,7 @@ from .text_encoder import TextEncoder
 from .feature_encoder import FeatureEncoder
 from .cross_attention import CrossViewAttention
 from .mixture_of_experts import AdaptiveMixtureOfExperts
+from ..data.features import NUM_LINGUISTIC_FEATURES
 
 
 class TEGFND(nn.Module):
@@ -13,17 +14,23 @@ class TEGFND(nn.Module):
         self,
         num_classes,
         model_name="microsoft/deberta-v3-base",
-        linguistic_dim=14,
+        linguistic_dim=NUM_LINGUISTIC_FEATURES,
         feature_dim=256,
         fusion_dim=256,
         expert_dim=256,
+        num_experts=4,
         dropout=0.2,
+        freeze_layers=4,
+        moe_aux_loss_weight=0.01,
     ):
         super().__init__()
+
+        self.moe_aux_loss_weight = moe_aux_loss_weight
 
         self.text_encoder = TextEncoder(
             model_name=model_name,
             dropout=dropout,
+            freeze_layers=freeze_layers,
         )
 
         self.feature_encoder = FeatureEncoder(
@@ -43,7 +50,7 @@ class TEGFND(nn.Module):
         self.moe = AdaptiveMixtureOfExperts(
             input_dim=fusion_dim,
             expert_dim=expert_dim,
-            num_experts=3,
+            num_experts=num_experts,
             dropout=dropout,
         )
 
@@ -75,7 +82,7 @@ class TEGFND(nn.Module):
             linguistic,
         )
 
-        representation, gate_weights = self.moe(
+        representation, gate_weights, moe_aux_loss = self.moe(
             fused
         )
 
@@ -106,4 +113,5 @@ class TEGFND(nn.Module):
             "confidence": confidence,
             "entropy": entropy,
             "gate_weights": gate_weights,
+            "aux_loss": self.moe_aux_loss_weight * moe_aux_loss,
         }
