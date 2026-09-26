@@ -205,12 +205,17 @@ def main(argv=None):
     # 0.72 by epoch 13-15 -- a textbook small-dataset transformer
     # overfit (DeBERTa-v3-base is ~86M parameters against ~1043
     # training examples). freeze_layers=4 was not nearly enough to
-    # control that gap, so the default is raised to 8 (of
-    # deberta-v3-base's 12 encoder layers, leaving only the top 4 +
-    # the task heads trainable). See README for why --model
-    # propagation is the bigger lever here.
-    parser.add_argument("--freeze-layers", type=int, default=8)
-    parser.add_argument("--patience", type=int, default=5)
+    # control that gap. But a first `propagation` run with
+    # freeze_layers=8 did WORSE (val F1 0.67 vs 0.73) -- the graph
+    # branch adds a lot of new, randomly-initialized capacity
+    # (graph encoder, temporal encoder, 4-way fusion) that needs
+    # more backbone flexibility to learn a good joint text+graph
+    # representation than the text-only model does. So the default
+    # is model-dependent: 8 (of deberta-v3-base's 12 layers) for
+    # tegfnd/deberta, 4 for propagation. Pass --freeze-layers
+    # explicitly to override either way.
+    parser.add_argument("--freeze-layers", type=int, default=None)
+    parser.add_argument("--patience", type=int, default=6)
 
     parser.add_argument("--max-length", type=int, default=192)
     parser.add_argument("--seed", type=int, default=42)
@@ -233,6 +238,12 @@ def main(argv=None):
 
     args = parser.parse_args(argv)
 
+    # Model-dependent freeze_layers default (see the --freeze-layers
+    # help text above for why tegfnd/deberta and propagation want
+    # different defaults).
+    if args.freeze_layers is None:
+        args.freeze_layers = 4 if args.model == "propagation" else 8
+
     # --------------------------------------------------
     # Reproducibility
     # --------------------------------------------------
@@ -253,6 +264,7 @@ def main(argv=None):
     print(f"Dataset: {args.dataset}")
     print(f"Model: {args.model}")
     print(f"Seed: {args.seed}")
+    print(f"Freeze layers: {args.freeze_layers}")
 
     # --------------------------------------------------
     # Dataset

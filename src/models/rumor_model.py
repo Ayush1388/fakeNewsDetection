@@ -136,11 +136,6 @@ class PropagationFusion(nn.Module):
             need_weights=False,
         )
 
-        # Mean-pooled attended representation.
-        pooled = attended.mean(
-            dim=1
-        )
-
         # Learn how much each view should contribute.
         gate_input = torch.cat(
             [
@@ -165,8 +160,30 @@ class PropagationFusion(nn.Module):
             dim=1,
         )
 
+        # --------------------------------------------------
+        # Residual base = the TEXT view, not a blind unweighted
+        # mean of all four views.
+        #
+        # An earlier version used `attended.mean(dim=1)` here, which
+        # structurally forced at least ~25% blind weight onto every
+        # view (including graph/temporal) regardless of what the
+        # gate learned -- so even a gate that correctly identified
+        # the propagation-graph view as noise for a given example
+        # could never suppress it below that floor. On a real run,
+        # this measurably made the propagation model WORSE than the
+        # text-only model (val macro-F1 0.73 -> 0.67), because most
+        # of what the model needs comes from the text and the
+        # blind-averaged graph/temporal signal was diluting it.
+        #
+        # Anchoring the residual on the text view instead means the
+        # model's default is "trust the text", and the gate can
+        # *add* graph/temporal/linguistic evidence on top only when
+        # it actually helps a given example, rather than being stuck
+        # blending in noise it has no way to fully suppress.
+        # --------------------------------------------------
+
         fused = self.norm(
-            pooled
+            views[:, 0]
             + self.dropout(gated)
         )
 
