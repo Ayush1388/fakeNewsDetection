@@ -106,6 +106,7 @@ def neural_config(args):
         "head_lr": args.head_lr,
         "weight_decay": args.weight_decay,
         "patience": args.patience,
+        "dropout": args.dropout,
     }
 
 
@@ -142,6 +143,7 @@ def run_neural(model, dataset, seed, test_ids_path, work_dir, args):
         "--head-lr", str(args.head_lr),
         "--weight-decay", str(args.weight_decay),
         "--patience", str(args.patience),
+        "--dropout", str(args.dropout),
         "--model-name", args.model_name,
     ]
     print("  $", " ".join(cmd[1:]), flush=True)
@@ -198,23 +200,21 @@ def main(argv=None):
         help="Neural models from scripts/train.py to run (deberta, tegfnd, propagation).",
     )
     parser.add_argument("--quick", action="store_true", help="One seed per protocol.")
-    # Fine-tuning recipe for the neural baselines. These are the settings
-    # of the best earlier DeBERTa/TEG-FND run on Twitter15 (val macro-F1
-    # 0.73, train F1 0.99): 4 of 12 layers frozen, backbone LR 1e-5,
-    # head LR 1e-4, weight decay 0.01. The stronger
-    # regularisation later made the train.py default (8 frozen layers,
-    # head LR 5e-5) under-fits badly at 64 tokens (train acc ~0.45 after
-    # 15 epochs), which would make an unfair baseline.
-    parser.add_argument("--epochs", type=int, default=20)
+    # Fine-tuning recipe for the neural baselines = EXACTLY the recipe of
+    # the best earlier TEG-FND run on Twitter15 (val macro-F1 0.7262,
+    # train F1 0.99): max_length 192, dropout 0.2, 4 of 12 layers
+    # frozen, backbone LR 1e-5, head LR 1e-4, weight decay 0.01,
+    # 15 epochs, patience 5. Only the split/seed differ from that run.
+    # (A first baseline run with 64 tokens / dropout 0.3 / seeds 0-1
+    # learned far more slowly: train F1 ~0.55 after 20 epochs.)
+    parser.add_argument("--epochs", type=int, default=15)
     parser.add_argument("--freeze-layers", type=int, default=4)
     parser.add_argument("--backbone-lr", type=float, default=1e-5)
     parser.add_argument("--head-lr", type=float, default=1e-4)
     parser.add_argument("--weight-decay", type=float, default=0.01)
-    parser.add_argument("--patience", type=int, default=6)
-    parser.add_argument(
-        "--max-length", type=int, default=64,
-        help="Tweets are <= 140 chars / 29 words, so 64 tokens loses nothing.",
-    )
+    parser.add_argument("--patience", type=int, default=5)
+    parser.add_argument("--dropout", type=float, default=0.2)
+    parser.add_argument("--max-length", type=int, default=192)
     parser.add_argument("--model-name", default="microsoft/deberta-v3-base")
     parser.add_argument("--out-dir", default="results/baselines")
     parser.add_argument("--no-gestack", action="store_true",
