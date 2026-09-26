@@ -27,6 +27,21 @@ The grouped split uses numpy's frozen `RandomState` stream rather than scikit-le
 
 Per-view ablation (random split, earlier 5-seed run on seeds 42,1,2,3,4): Twitter15 -- text 86.7%, spreaders 71.3%, cascade 42.1%, stacked 92.1%. Twitter16 -- text 86.7%, spreaders 75.9%, cascade 50.6%, stacked 90.6%. The propagation views add ~4-5 points over text alone on the random split and ~7-10 points on the story-disjoint split, i.e. graph information is doing real work, as in GETAE.
 
+**Paired neural baselines (Kaggle T4 run, identical test sets, accuracy %):**
+
+| | GE-Stack | DeBERTa-v3 | TEG-FND |
+|---|---|---|---|
+| Twitter15 random (seeds 0-2) | **92.26** | 71.88 | 68.01 |
+| Twitter15 story-disjoint 0.5 (seeds 0-2) | **84.52** | 63.84 | 60.57 |
+| Twitter15 temporal | **65.18** | 49.11 | 45.09 |
+| Twitter16 random (seeds 0-2) | **92.14** | 70.46 | 70.46 |
+| Twitter16 story-disjoint 0.5 (seeds 0-2) | **82.93** | 62.87 | 60.98 |
+| Twitter16 temporal | **56.91** | 43.90 | 43.09 |
+
+**GETAE's binary protocol** (true vs false only, ten 80/20 splits; `python scripts/binary_getae_protocol.py`): GE-Stack 95.37% (Twitter15) and 95.78% (Twitter16) vs. 82.7% / 89.6% reported by GETAE.
+
+**Leave-one-view-out ablation** (`python scripts/ablation_views.py twitter15 random`): removing the text view costs 5.7-19.8 points, the spreader view 2.7-5.4 points, the cascade view < 1 point.
+
 **Neural baselines on identical test sets** (GPU, ~2-3 h on a Kaggle T4; resumable):
 ```bash
 python scripts/run_deberta_baselines.py --out-dir /kaggle/working/baseline_results
