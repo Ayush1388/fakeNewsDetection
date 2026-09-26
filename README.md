@@ -2,23 +2,55 @@
 
 Temporal Evidence-Graph Fusion Network for Fake News Detection.
 
+## Headline model: GE-Stack (Graph-Enhanced Stacked Ensemble) -- use this one
+
+```bash
+python scripts/train_ensemble.py --dataset both                 # random split (base-paper protocol)
+python scripts/train_ensemble.py --dataset both --split grouped # story-disjoint split (harder)
+```
+CPU only, ~1-2 minutes per dataset, no GPU and no DeBERTa download needed.
+
+Measured test results (4-class: non-rumor / true / false / unverified), mean +/- std over 5 split seeds (42,1,2,3,4):
+
+| Dataset | Random stratified 70/15/15 split | Story-disjoint (grouped) split |
+|---|---|---|
+| Twitter15 | **92.05% +/- 0.87** acc, 92.03% macro-F1 | 87.79% +/- 4.42 acc |
+| Twitter16 | **90.57% +/- 1.10** acc, 90.55% macro-F1 | 86.32% +/- 3.33 acc |
+
+Per-view ablation (random split, mean test accuracy): Twitter15 -- text 86.7%, spreaders 71.3%, cascade 42.1%, stacked 92.1%. Twitter16 -- text 86.7%, spreaders 75.9%, cascade 50.6%, stacked 90.6%. The propagation views add ~4-5 points over text alone on the random split and ~7-10 points on the story-disjoint split, i.e. graph information is doing real work, as in GETAE.
+
+**Architecture** (`src/models/graph_ensemble.py`), same principle as the GETAE base paper (text view + propagation-graph view, combined by an ensemble):
+1. **Text view** -- word 1-2-gram + character 2-5-gram TF-IDF of the source tweet -> logistic regression.
+2. **Spreader (graph) view** -- the users in the propagation tree ("who spread it") as a TF-IDF bag of user ids -> logistic regression. This is the item's neighbourhood in the user-news propagation graph, the same information GETAE's Node2Vec/DeepWalk embeddings and GCAN's user encoder use.
+3. **Cascade view** -- 8 structural/temporal statistics of the cascade (size, unique users, delay mean/median/max, fraction spread within 5 min / 1 h / 1 day) -> logistic regression.
+4. **Meta-learner** -- logistic regression over the three views' log-probabilities, trained on 5-fold **out-of-fold** predictions (like EnsembleNet's ensemble stage, but stacked instead of averaged).
+
+**Evaluation protocol:** per seed, the same stratified 70/15/15 split function as `scripts/train.py`; the model is fit on train+val (the meta-learner's cross-validation replaces a separate validation set) and scored once on the untouched 15% test split. Results are written to `results/ensemble/*_results.json`, the seed-42 model to `results/ensemble/*.joblib`.
+
+**How to report these numbers honestly:**
+- The random-split numbers use the same protocol as the Twitter15/16 literature and the base papers, so they are the comparable ones. Note they are **4-class**; GETAE and EnsembleNet report *binary* accuracy, an easier task.
+- Twitter15/16 contain many tweets about the same story with the same label (about 15% of test tweets have a near-duplicate in train), and a random split puts siblings on both sides. That inflates every model on this benchmark, including published ones. The grouped split (`--split grouped`, tweets with word TF-IDF cosine >= 0.5 kept together) removes this and is the better estimate for unseen stories.
+- Classes were collected at different times, so part of what the text and spreader views learn is "what was in the news / who was active then". This is a known property of these datasets.
+- An independent review found no leakage in the pipeline: the vectorisers, scaler, base models and meta-learner are all fit without test data, and shuffling the training labels drops test accuracy to ~21%.
+
+**Why not the DeBERTa models:** on the same split family, fine-tuned DeBERTa-v3 reached ~72% (`tegfnd`, train F1 0.99 vs val F1 0.72) and ~67% (`propagation`). With ~1k short tweets, an 86M-parameter transformer overfits, while sparse n-gram + spreader features with strong linear models generalise better. The neural models are kept below for ablation/comparison; `scripts/train.py` now also reports held-out **test** accuracy at the end of training.
+
+---
+
 ## Current data contract
 The supplied Twitter15/Twitter16 files contain `label.txt` and `source_tweets.txt`, plus a `tree/` directory of propagation trees (parent -> child edges with per-node relative timestamps), used by the `propagation` model variant. PolitiFact has text + verdict labels only (no propagation data).
 
-## Model variants (`--model`)
+## Neural model variants (`scripts/train.py --model`, kept for ablation)
 - `tegfnd` (default): DeBERTa-v3 encoder → multi-view pooling (attention + mean + max) → stylometric linguistic-feature branch → cross-view attention fusion → adaptive Mixture-of-Experts (with a load-balancing auxiliary loss) → classification + uncertainty head.
-- `propagation` (**use this one if you want to close the gap toward literature numbers in the 80s** — see below): adds a graph-attention propagation-tree encoder and a temporal-delay encoder, fused with the text/linguistic views via a 4-way gated attention fusion. Twitter15/Twitter16 only.
+- `propagation`: adds a graph-attention propagation-tree encoder and a temporal-delay encoder, fused with the text/linguistic views via a 4-way gated attention fusion. Twitter15/Twitter16 only.
 - `deberta`: DeBERTa-v3 text-only baseline, for ablation.
 
-## Why `tegfnd` alone plateaus around 71-73% on Twitter15/16, and what actually gets to ~85%
+## (Historical) Why `tegfnd` plateaus around 71-73% on Twitter15/16
 A `tegfnd` run (text + linguistic features only, no propagation graph) on Twitter15 hits **Train F1 0.99 / Val F1 0.72** by epoch 13-15 — the gap opens by epoch ~5 and never closes. That's not a training-recipe problem you can regularize your way past indefinitely; it's a ceiling from **what information is actually in a single ~80-100 character source tweet**. Whether "the vote was rigged!!" is a rumor, confirmed true, confirmed false, or unverified frequently isn't decidable from the tweet text alone — it depends on how the community responded (denials, corroborations, the shape and speed of the retweet/reply cascade).
 
 This is exactly the finding in the rumor-detection literature this dataset comes from (Ma et al. 2016/2017; the GCAN/BiGCN/PLAN line of work cited in the GETAE paper you supplied): text-only baselines on Twitter15/16 cluster in the low-to-mid 70s, while models that use the **propagation tree** reach the mid-80s to high-80s. GETAE itself (your base paper) gets its 82-90% by combining text with a Node2Vec/DeepWalk embedding of the propagation graph — not from a stronger text encoder alone. The data for this is already sitting in `data/twitter15/tree/` and `data/twitter16/tree/`, and this repo's `propagation` model (`PropagationRumorModel`) already consumes it — it just hadn't been trained yet.
 
 **Concretely: run `--model propagation`, not `--model tegfnd`, if the target is 85%.** It won't be automatic — the graph branch has the same small-dataset overfitting risk as the text branch — but it's the architectural lever that's actually aligned with how the base papers get their numbers, whereas further tuning the text-only model is optimizing the wrong axis.
-
-## Changes made on top of the 71%-accuracy baseline run
-The original pipeline had several bugs/gaps that capped its accuracy well below what the architecture was capable of:
 
 ## Changes made on top of the 71%-accuracy baseline run
 The original pipeline had several bugs/gaps that capped its accuracy well below what the architecture was capable of:
@@ -56,7 +88,7 @@ This was the important one, because it meant *adding more information (the propa
 None of this guarantees a specific number — it fixes real bugs (some of which meant parts of the pipeline could not previously run at all) and applies standard, well-evidenced techniques for fine-tuning transformers on small, class-balanced text datasets. **Retrain and re-evaluate to get the actual new number**; report it only after doing so.
 
 ## Evaluation contract
-- Train/validation/test split: 70/15/15, stratified, event-level.
+- Train/validation/test split: 70/15/15, stratified, **random** (tweet-level, not event-level -- same as the base papers). `scripts/train_ensemble.py --split grouped` additionally gives a story-disjoint split.
 - Model selection: validation Macro-F1 only, with early stopping.
 - Test set: evaluated only after the checkpoint is frozen.
 - Primary metrics: Accuracy and Macro-F1.
@@ -68,11 +100,11 @@ None of this guarantees a specific number — it fixes real bugs (some of which 
 ```bash
 pip install -r requirements.txt
 
-# TEG-FND (default, recommended)
+# TEG-FND neural model (ablation; needs GPU)
 python scripts/train.py --dataset twitter15 --model tegfnd
 python scripts/train.py --dataset twitter16 --model tegfnd
 
-# Propagation-graph variant (Twitter15/16 only) -- this is the one to run for 80s-range accuracy
+# Neural propagation-graph variant (ablation; needs GPU)
 python scripts/train.py --dataset twitter15 --model propagation
 # or, equivalently:
 python scripts/train_propagation.py --dataset twitter15
@@ -81,6 +113,9 @@ python scripts/train_propagation.py --dataset twitter15
 # ORIGINAL total budget, e.g. still 15, not "epochs remaining")
 python scripts/train.py --dataset twitter15 --model propagation \
     --resume results/checkpoints/twitter15_propagation_seed42_last.pt --epochs 15
+
+# Graph-Enhanced Stacked Ensemble (headline model, CPU, ~1-2 min)
+python scripts/train_ensemble.py --dataset both
 
 # Text-only baseline (ablation)
 python scripts/train.py --dataset politifact --model deberta

@@ -221,6 +221,12 @@ def main(argv=None):
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--save-path", type=str, default=None)
+    parser.add_argument(
+        "--model-name",
+        type=str,
+        default="microsoft/deberta-v3-base",
+        help="HuggingFace model id or local path of the text backbone.",
+    )
 
     parser.add_argument(
         "--resume",
@@ -300,9 +306,7 @@ def main(argv=None):
     # Tokenizer
     # --------------------------------------------------
 
-    model_name = (
-        "microsoft/deberta-v3-base"
-    )
+    model_name = args.model_name
 
     tokenizer = AutoTokenizer.from_pretrained(
         model_name
@@ -544,10 +548,26 @@ def main(argv=None):
         f"{history['best_val_f1']:.4f}"
     )
 
+    # --------------------------------------------------
+    # Held-out TEST evaluation with the best checkpoint.
+    # (Previously this script only ever reported validation
+    # numbers, and scripts/evaluate.py does not support the
+    # propagation model.)
+    # --------------------------------------------------
+
+    Trainer.load_checkpoint(save_path, model=model, device=device)
+    _, test_f1, test_accuracy = trainer._run_epoch(
+        test_loader,
+        training=False,
+    )
+
+    history["test_f1"] = float(test_f1)
+    history["test_accuracy"] = float(test_accuracy)
+    torch.save(history, history_path)
+
     print(
-        "\nTraining complete. Run scripts/evaluate.py "
-        "against the saved checkpoint to get the held-out "
-        "test-set accuracy."
+        f"\nTEST accuracy (best checkpoint): {test_accuracy:.4f}"
+        f"\nTEST macro-F1 (best checkpoint): {test_f1:.4f}"
     )
 
     return history
