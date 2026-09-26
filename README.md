@@ -5,19 +5,27 @@ Temporal Evidence-Graph Fusion Network for Fake News Detection.
 ## Headline model: GE-Stack (Graph-Enhanced Stacked Ensemble) -- use this one
 
 ```bash
-python scripts/train_ensemble.py --dataset both                 # random split (base-paper protocol)
-python scripts/train_ensemble.py --dataset both --split grouped # story-disjoint split (harder)
+python scripts/train_ensemble.py --dataset both                        # 10 random splits (literature protocol)
+python scripts/train_ensemble.py --dataset both --split grouped        # story-disjoint (cosine >= 0.5)
+python scripts/train_ensemble.py --dataset both --split grouped --group-threshold 0.3   # stricter story grouping
+python scripts/train_ensemble.py --dataset both --split temporal       # train on past, test on newest 15%
 ```
-CPU only, ~1-2 minutes per dataset, no GPU and no DeBERTa download needed.
+CPU only, no GPU or DeBERTa download needed. Every run writes `results/<save-dir>/*_results.json` (per-split metrics, 95% CI, significance test, library versions) and `splits/*_test_ids.json` (the exact test tweet ids of every split, so baselines can be run on identical splits).
 
-Measured test results (4-class: non-rumor / true / false / unverified), mean +/- std over 5 split seeds (42,1,2,3,4):
+Measured test results (4-class: non-rumor / true / false / unverified), seeds 0-9:
 
-| Dataset | Random stratified 70/15/15 split | Story-disjoint (grouped) split |
-|---|---|---|
-| Twitter15 | **92.05% +/- 0.87** acc, 92.03% macro-F1 | 87.79% +/- 4.42 acc |
-| Twitter16 | **90.57% +/- 1.10** acc, 90.55% macro-F1 | 86.32% +/- 3.33 acc |
+| Protocol | Twitter15 acc | Twitter16 acc | Stack vs text-only (paired t-test) |
+|---|---|---|---|
+| Random stratified 70/15/15, 10 splits | **91.79% +/- 1.62** (95% CI 90.6-93.0), F1 91.77 | **92.44% +/- 2.03** (95% CI 90.9-94.0), F1 92.44 | +6.4 / +4.9 pts, p < 1e-3, 10/10 wins |
+| Story-disjoint, cosine >= 0.5, 10 splits | 85.89% +/- 2.44 | 79.84% +/- 4.70 | +8.8 / +7.6 pts, p < 1e-3 |
+| Story-disjoint, cosine >= 0.3, 10 splits | 71.47% +/- 4.03 | 70.08% +/- 3.50 | +16.6 / +10.9 pts, p < 1e-6 |
+| Temporal (newest 15% per class), 1 split | 65.18% | 56.91% | -- |
 
-Per-view ablation (random split, mean test accuracy): Twitter15 -- text 86.7%, spreaders 71.3%, cascade 42.1%, stacked 92.1%. Twitter16 -- text 86.7%, spreaders 75.9%, cascade 50.6%, stacked 90.6%. The propagation views add ~4-5 points over text alone on the random split and ~7-10 points on the story-disjoint split, i.e. graph information is doing real work, as in GETAE.
+Accuracy falls as train/test overlap is removed; this happens to every model on this benchmark (see PSA, Wu & Hooi 2022; "Examining the limitations of computational rumor detection models trained on static datasets", 2023). The benefit of the propagation (spreader + cascade) views *grows* as the split gets harder: +5-6 points on random splits, +11-17 points on strict story-disjoint splits. On the temporal split the spreader view alone (59.4% / 53.7%) beats the text view alone (44.2% / 42.3%). Split luck alone moves a 5-split mean by ~2 points (Twitter16: 90.57% on seeds 42,1,2,3,4 vs 92.44% on seeds 0-9), so single-split differences of 1-2 points between papers are not meaningful.
+
+The grouped split uses numpy's frozen `RandomState` stream rather than scikit-learn's `StratifiedGroupKFold` (whose fold assignment changed between versions and gave different numbers on Kaggle), so the same seed gives the same split on any machine.
+
+Per-view ablation (random split, earlier 5-seed run on seeds 42,1,2,3,4): Twitter15 -- text 86.7%, spreaders 71.3%, cascade 42.1%, stacked 92.1%. Twitter16 -- text 86.7%, spreaders 75.9%, cascade 50.6%, stacked 90.6%. The propagation views add ~4-5 points over text alone on the random split and ~7-10 points on the story-disjoint split, i.e. graph information is doing real work, as in GETAE.
 
 **Architecture** (`src/models/graph_ensemble.py`), same principle as the GETAE base paper (text view + propagation-graph view, combined by an ensemble):
 1. **Text view** -- word 1-2-gram + character 2-5-gram TF-IDF of the source tweet -> logistic regression.
@@ -25,7 +33,7 @@ Per-view ablation (random split, mean test accuracy): Twitter15 -- text 86.7%, s
 3. **Cascade view** -- 8 structural/temporal statistics of the cascade (size, unique users, delay mean/median/max, fraction spread within 5 min / 1 h / 1 day) -> logistic regression.
 4. **Meta-learner** -- logistic regression over the three views' log-probabilities, trained on 5-fold **out-of-fold** predictions (like EnsembleNet's ensemble stage, but stacked instead of averaged).
 
-**Evaluation protocol:** per seed, the same stratified 70/15/15 split function as `scripts/train.py`; the model is fit on train+val (the meta-learner's cross-validation replaces a separate validation set) and scored once on the untouched 15% test split. Results are written to `results/ensemble/*_results.json`, the seed-42 model to `results/ensemble/*.joblib`.
+**Evaluation protocol:** per seed, the same stratified 70/15/15 split function as `scripts/train.py`; the model is fit on train+val (the meta-learner's cross-validation replaces a separate validation set) and scored once on the untouched 15% test split. Results are written to `results/ensemble/*_results.json`, the first seed's model to `results/ensemble/*.joblib`.
 
 **How to report these numbers honestly:**
 - The random-split numbers use the same protocol as the Twitter15/16 literature and the base papers, so they are the comparable ones. Note they are **4-class**; GETAE and EnsembleNet report *binary* accuracy, an easier task.

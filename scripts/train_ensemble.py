@@ -85,17 +85,69 @@ def story_groups(texts, threshold=0.5):
     return groups
 
 
-def create_grouped_splits(labels, groups, seed):
+def create_grouped_splits(labels, groups, seed, test_frac=0.15):
     """
     Story-disjoint split: no story cluster appears in both the fit
-    data and the test data. One of 7 stratified group folds (~14%)
-    is the test set.
-    """
-    from sklearn.model_selection import StratifiedGroupKFold
+    data and the test data.
 
-    sgkf = StratifiedGroupKFold(n_splits=7, shuffle=True, random_state=seed)
-    fit_idx, test_idx = next(sgkf.split(np.zeros(len(labels)), labels, groups))
-    return fit_idx, test_idx
+    Implemented with numpy's legacy RandomState (whose stream is
+    frozen across numpy versions) instead of sklearn's
+    StratifiedGroupKFold, whose fold assignment changed between
+    scikit-learn releases and gave different test sets on Kaggle
+    than locally. Same seed -> same split on any machine.
+
+    Groups are visited in a seeded random order; a group goes to the
+    test set if it doesn't push any class above its quota
+    (test_frac * class size), so the test set is ~15% and roughly
+    class-balanced.
+    """
+    labels = np.asarray(labels)
+    groups = np.asarray(groups)
+    rng = np.random.RandomState(seed)
+
+    classes = np.unique(labels)
+    quota = {c: int(round(test_frac * (labels == c).sum())) for c in classes}
+    taken = {c: 0 for c in classes}
+
+    unique_groups = np.unique(groups)
+    order = rng.permutation(len(unique_groups))
+    members = {g: np.flatnonzero(groups == g) for g in unique_groups}
+
+    test_mask = np.zeros(len(labels), dtype=bool)
+
+    for gi in order:
+        idx = members[unique_groups[gi]]
+        counts = {c: int((labels[idx] == c).sum()) for c in classes}
+
+        if all(taken[c] + counts[c] <= quota[c] for c in classes):
+            test_mask[idx] = True
+            for c in classes:
+                taken[c] += counts[c]
+
+        if all(taken[c] >= quota[c] for c in classes):
+            break
+
+    return np.flatnonzero(~test_mask), np.flatnonzero(test_mask)
+
+
+def create_temporal_split(labels, tweet_ids, test_frac=0.15):
+    """
+    Chronological split: within each class, the newest 15% of tweets
+    (Twitter snowflake ids increase with time) are the test set. The
+    model is trained on the past and tested on the future, which is
+    how a deployed detector is used. Deterministic (no seed).
+    """
+    labels = np.asarray(labels)
+    ids = np.asarray([int(t) for t in tweet_ids])
+    test_mask = np.zeros(len(labels), dtype=bool)
+
+    for c in np.unique(labels):
+        idx = np.flatnonzero(labels == c)
+        idx = idx[np.argsort(ids[idx], kind="stable")]
+        n_test = int(round(test_frac * len(idx)))
+        test_mask[idx[len(idx) - n_test:]] = True
+
+    return np.flatnonzero(~test_mask), np.flatnonzero(test_mask)
 
 
 def metrics(y_true, y_pred):
@@ -110,11 +162,24 @@ def metrics(y_true, y_pred):
     }
 
 
+def _versions():
+    import platform
+    import scipy
+    import sklearn
+
+    return {
+        "python": platform.python_version(),
+        "numpy": np.__version__,
+        "scipy": scipy.__version__,
+        "scikit-learn": sklearn.__version__,
+    }
+
+
 def subset(views, idx):
     return {k: v[idx] for k, v in views.items()}
 
 
-def run_dataset(dataset, seeds, save_dir, split="random"):
+def run_dataset(dataset, seeds, save_dir, split="random", group_threshold=0.5):
     print("=" * 64)
     print(f"Dataset: {dataset}")
 
@@ -136,18 +201,26 @@ def run_dataset(dataset, seeds, save_dir, split="random"):
     per_seed = []
     ablation = {}
 
+    tweet_ids = df["id"].astype(str).to_numpy()
+
     if split == "grouped":
-        groups = story_groups(views["text"])
+        groups = story_groups(views["text"], threshold=group_threshold)
         print(
-            f"Split: GROUPED (story-disjoint) -- {len(df)} tweets in "
-            f"{len(np.unique(groups))} story clusters"
+            f"Split: GROUPED (story-disjoint, cosine >= {group_threshold}) -- "
+            f"{len(df)} tweets in {len(np.unique(groups))} story clusters"
         )
+    elif split == "temporal":
+        # Deterministic: one split, so run it once.
+        seeds = seeds[:1]
+        print("Split: TEMPORAL (per class, newest 15% of tweets = test)")
     else:
         print("Split: RANDOM stratified 70/15/15 (the protocol the base papers use)")
 
     for i, seed in enumerate(seeds):
         if split == "grouped":
             fit_idx, test_idx = create_grouped_splits(labels, groups, seed)
+        elif split == "temporal":
+            fit_idx, test_idx = create_temporal_split(labels, tweet_ids)
         else:
             train_idx, val_idx, test_idx = create_splits(labels, seed)
             fit_idx = np.concatenate([train_idx, val_idx])
@@ -160,7 +233,16 @@ def run_dataset(dataset, seeds, save_dir, split="random"):
 
         m = metrics(y_test, y_pred)
         m["seed"] = seed
+        m["n_fit"] = int(len(fit_idx))
+        m["n_test"] = int(len(test_idx))
         per_seed.append(m)
+
+        # Save the exact test tweet ids so the split can be reproduced
+        # (and re-used for baselines) by anyone.
+        split_dir = save_dir / "splits"
+        split_dir.mkdir(parents=True, exist_ok=True)
+        with open(split_dir / f"{dataset}_{split}_seed{seed}_test_ids.json", "w") as f:
+            json.dump(sorted(tweet_ids[test_idx].tolist()), f)
 
         # Per-view ablation: each base view on its own, same test split.
         for name, proba in model.view_probabilities(test_views).items():
@@ -190,6 +272,33 @@ def run_dataset(dataset, seeds, save_dir, split="random"):
     accs = np.array([m["accuracy"] for m in per_seed])
     f1s = np.array([m["macro_f1"] for m in per_seed])
 
+    # 95% confidence interval of the mean (t distribution) and a
+    # paired significance test of the full stack vs. the text view
+    # alone on the same splits.
+    from scipy import stats
+
+    n = len(accs)
+    if n > 1:
+        half = stats.t.ppf(0.975, n - 1) * accs.std(ddof=1) / np.sqrt(n)
+        ci = (float(accs.mean() - half), float(accs.mean() + half))
+        text_accs = np.array(ablation["text"])
+        diff = accs - text_accs
+        t_p = float(stats.ttest_rel(accs, text_accs).pvalue) if diff.std() > 0 else 0.0
+        try:
+            w_p = float(stats.wilcoxon(accs, text_accs).pvalue)
+        except ValueError:
+            w_p = float("nan")
+        significance = {
+            "stack_minus_text_mean": float(diff.mean()),
+            "paired_t_test_p": t_p,
+            "wilcoxon_p": w_p,
+            "stack_wins": int((diff > 0).sum()),
+            "n_splits": n,
+        }
+    else:
+        ci = (float("nan"), float("nan"))
+        significance = None
+
     print("-" * 64)
     print(f"Per-class report (seed {first['seed']}):")
     print(first["report"])
@@ -202,6 +311,16 @@ def run_dataset(dataset, seeds, save_dir, split="random"):
     for name, vals in ablation.items():
         print(f"    {name:10s} {np.mean(vals):.4f}")
     print(f"    {'GE-Stack':10s} {accs.mean():.4f}   <- all views stacked")
+
+    if significance is not None:
+        print("-" * 64)
+        print(
+            f"Stack vs text-only: +{significance['stack_minus_text_mean'] * 100:.2f} "
+            f"points, wins on {significance['stack_wins']}/{n} splits, "
+            f"paired t-test p={significance['paired_t_test_p']:.2e}, "
+            f"Wilcoxon p={significance['wilcoxon_p']:.2e}"
+        )
+        print(f"95% CI of mean accuracy: [{ci[0]:.4f}, {ci[1]:.4f}]")
 
     print("-" * 64)
     print(
@@ -217,6 +336,9 @@ def run_dataset(dataset, seeds, save_dir, split="random"):
         "per_seed": per_seed,
         "mean_accuracy": float(accs.mean()),
         "std_accuracy": float(accs.std()),
+        "ci95_accuracy": ci,
+        "significance_vs_text": significance,
+        "versions": _versions(),
         "mean_macro_f1": float(f1s.mean()),
         "std_macro_f1": float(f1s.std()),
         "ablation_mean_accuracy": {k: float(np.mean(v)) for k, v in ablation.items()},
@@ -237,18 +359,28 @@ def main(argv=None):
         choices=["twitter15", "twitter16", "both"],
     )
     parser.add_argument(
-        "--seeds", default="42,1,2,3,4",
-        help="Comma-separated split seeds. The first one's model is saved.",
+        "--seeds", default="0,1,2,3,4,5,6,7,8,9",
+        help=(
+            "Comma-separated split seeds (default: 10 random splits, "
+            "the protocol used by e.g. RAGCL). The first one's model "
+            "is saved."
+        ),
     )
     parser.add_argument("--save-dir", default="results/ensemble")
     parser.add_argument(
-        "--split", default="random", choices=["random", "grouped"],
+        "--split", default="random", choices=["random", "grouped", "temporal"],
         help=(
             "random = stratified 70/15/15, same protocol as the base "
             "papers (comparable to their numbers). grouped = story-"
             "disjoint split, near-duplicate tweets never cross train/"
-            "test (harder, closer to performance on unseen stories)."
+            "test (harder, closer to performance on unseen stories). "
+            "temporal = per class, newest 15%% of tweets are the test "
+            "set (train on the past, test on the future)."
         ),
+    )
+    parser.add_argument(
+        "--group-threshold", type=float, default=0.5,
+        help="Cosine similarity for merging tweets into one story (grouped split).",
     )
     args = parser.parse_args(argv)
 
@@ -256,7 +388,7 @@ def main(argv=None):
     datasets = ["twitter15", "twitter16"] if args.dataset == "both" else [args.dataset]
     save_dir = Path(args.save_dir)
 
-    summaries = [run_dataset(d, seeds, save_dir, args.split) for d in datasets]
+    summaries = [run_dataset(d, seeds, save_dir, args.split, args.group_threshold) for d in datasets]
 
     print("=" * 64)
     for s in summaries:
