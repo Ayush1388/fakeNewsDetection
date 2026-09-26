@@ -27,6 +27,12 @@ The grouped split uses numpy's frozen `RandomState` stream rather than scikit-le
 
 Per-view ablation (random split, earlier 5-seed run on seeds 42,1,2,3,4): Twitter15 -- text 86.7%, spreaders 71.3%, cascade 42.1%, stacked 92.1%. Twitter16 -- text 86.7%, spreaders 75.9%, cascade 50.6%, stacked 90.6%. The propagation views add ~4-5 points over text alone on the random split and ~7-10 points on the story-disjoint split, i.e. graph information is doing real work, as in GETAE.
 
+**Neural baselines on identical test sets** (GPU, ~2-3 h on a Kaggle T4; resumable):
+```bash
+python scripts/run_deberta_baselines.py --out-dir /kaggle/working/baseline_results
+```
+Fine-tunes DeBERTa-v3 (`deberta`, text only) and TEG-FND (`tegfnd`, text + linguistic features) and re-scores GE-Stack on exactly the same test tweets (random seeds 0-2, story-disjoint seeds 0-2, temporal), writing `baseline_results.json` and a summary table. Re-running the same command skips finished runs.
+
 **Architecture** (`src/models/graph_ensemble.py`), same principle as the GETAE base paper (text view + propagation-graph view, combined by an ensemble):
 1. **Text view** -- word 1-2-gram + character 2-5-gram TF-IDF of the source tweet -> logistic regression.
 2. **Spreader (graph) view** -- the users in the propagation tree ("who spread it") as a TF-IDF bag of user ids -> logistic regression. This is the item's neighbourhood in the user-news propagation graph, the same information GETAE's Node2Vec/DeepWalk embeddings and GCAN's user encoder use.
