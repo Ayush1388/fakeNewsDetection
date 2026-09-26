@@ -88,12 +88,14 @@ def build_model(
     num_classes,
     model_name,
     freeze_layers,
+    dropout=0.3,
 ):
     if model_type == "deberta":
         return DeBERTaBaseline(
             num_classes=num_classes,
             model_name=model_name,
             freeze_layers=freeze_layers,
+            dropout=dropout,
         )
 
     if model_type == "tegfnd":
@@ -102,6 +104,7 @@ def build_model(
             model_name=model_name,
             linguistic_dim=NUM_LINGUISTIC_FEATURES,
             freeze_layers=freeze_layers,
+            dropout=dropout,
         )
 
     if model_type == "propagation":
@@ -113,7 +116,7 @@ def build_model(
             feature_dim=256,
             temporal_dim=256,
             fusion_dim=256,
-            dropout=0.3,
+            dropout=dropout,
             freeze_layers=freeze_layers,
         )
 
@@ -216,6 +219,12 @@ def main(argv=None):
     # explicitly to override either way.
     parser.add_argument("--freeze-layers", type=int, default=None)
     parser.add_argument("--patience", type=int, default=6)
+    parser.add_argument(
+        "--dropout",
+        type=float,
+        default=0.3,
+        help="Dropout of the model heads/encoder (the 72%% run used 0.2).",
+    )
 
     parser.add_argument("--max-length", type=int, default=192)
     parser.add_argument("--seed", type=int, default=42)
@@ -280,6 +289,14 @@ def main(argv=None):
     print(f"Model: {args.model}")
     print(f"Seed: {args.seed}")
     print(f"Freeze layers: {args.freeze_layers}")
+    print(
+        f"Recipe: max_length={args.max_length} dropout={args.dropout} "
+        f"backbone_lr={args.backbone_lr} head_lr={args.head_lr} "
+        f"weight_decay={args.weight_decay} epochs={args.epochs} "
+        f"patience={args.patience}"
+    )
+    import transformers as _tf
+    print(f"transformers {_tf.__version__}, torch {torch.__version__}")
 
     # --------------------------------------------------
     # Dataset
@@ -433,6 +450,7 @@ def main(argv=None):
         num_classes=num_classes,
         model_name=model_name,
         freeze_layers=args.freeze_layers,
+        dropout=args.dropout,
     )
 
     model = model.to(device).float()
