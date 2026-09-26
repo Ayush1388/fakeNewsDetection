@@ -219,6 +219,15 @@ def main(argv=None):
 
     parser.add_argument("--max-length", type=int, default=192)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--test-ids",
+        type=str,
+        default=None,
+        help=(
+            "JSON list of tweet ids to use as the test set (instead of "
+            "the default random 70/15/15 split)."
+        ),
+    )
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--save-path", type=str, default=None)
     parser.add_argument(
@@ -293,10 +302,35 @@ def main(argv=None):
     # Stratified train / validation / test split
     # --------------------------------------------------
 
-    train_df, val_df, test_df = create_splits(
-        dataframe,
-        args.seed,
-    )
+    if args.test_ids is not None:
+        # Fixed test set (e.g. the exact split GE-Stack was scored
+        # on, see scripts/run_deberta_baselines.py). The remaining
+        # tweets are split 85/15 stratified into train/validation;
+        # validation is used only for early stopping.
+        import json
+
+        with open(args.test_ids) as f:
+            test_id_set = set(str(t) for t in json.load(f))
+
+        is_test = dataframe["id"].astype(str).isin(test_id_set)
+        test_df = dataframe[is_test].reset_index(drop=True)
+        rest_df = dataframe[~is_test]
+
+        train_df, val_df = train_test_split(
+            rest_df,
+            test_size=0.15,
+            random_state=args.seed,
+            stratify=rest_df["label"],
+        )
+        train_df = train_df.reset_index(drop=True)
+        val_df = val_df.reset_index(drop=True)
+
+        print(f"Fixed test set from {args.test_ids}")
+    else:
+        train_df, val_df, test_df = create_splits(
+            dataframe,
+            args.seed,
+        )
 
     print(f"Train: {len(train_df)}")
     print(f"Validation: {len(val_df)}")
