@@ -96,8 +96,34 @@ def save_results(path, results):
     os.replace(tmp, path)
 
 
+def neural_config(args):
+    """Hyper-parameters that define a neural run; stored with each result."""
+    return {
+        "epochs": args.epochs,
+        "max_length": args.max_length,
+        "freeze_layers": args.freeze_layers,
+        "backbone_lr": args.backbone_lr,
+        "head_lr": args.head_lr,
+        "weight_decay": args.weight_decay,
+        "patience": args.patience,
+    }
+
+
+def config_tag(model, args):
+    if model == "gestack":
+        return "gestack"
+    c = neural_config(args)
+    return ",".join(f"{k}={c[k]}" for k in sorted(c))
+
+
+def record_tag(r):
+    # Records written before configs were stored: GE-Stack has no
+    # hyper-parameters, so they stay valid; old neural runs don't match.
+    return r.get("config") or ("gestack" if r["model"] == "gestack" else "unversioned")
+
+
 def run_key(r):
-    return (r["dataset"], r["protocol"], r["seed"], r["model"])
+    return (r["dataset"], r["protocol"], r["seed"], r["model"], record_tag(r))
 
 
 def run_neural(model, dataset, seed, test_ids_path, work_dir, args):
@@ -111,6 +137,11 @@ def run_neural(model, dataset, seed, test_ids_path, work_dir, args):
         "--save-path", str(save_path),
         "--epochs", str(args.epochs),
         "--max-length", str(args.max_length),
+        "--freeze-layers", str(args.freeze_layers),
+        "--backbone-lr", str(args.backbone_lr),
+        "--head-lr", str(args.head_lr),
+        "--weight-decay", str(args.weight_decay),
+        "--patience", str(args.patience),
         "--model-name", args.model_name,
     ]
     print("  $", " ".join(cmd[1:]), flush=True)
@@ -138,13 +169,13 @@ def run_neural(model, dataset, seed, test_ids_path, work_dir, args):
     return result
 
 
-def summarize(results):
+def summarize(results, current_tags):
     print("\n" + "=" * 78)
     print("SUMMARY  (mean test accuracy / macro-F1 over seeds, identical test sets)")
     print("=" * 78)
     rows = {}
     for r in results:
-        if r.get("accuracy") is None:
+        if r.get("accuracy") is None or record_tag(r) not in current_tags:
             continue
         rows.setdefault((r["dataset"], r["protocol"], r["model"]), []).append(r)
 
@@ -167,7 +198,19 @@ def main(argv=None):
         help="Neural models from scripts/train.py to run (deberta, tegfnd, propagation).",
     )
     parser.add_argument("--quick", action="store_true", help="One seed per protocol.")
-    parser.add_argument("--epochs", type=int, default=15)
+    # Fine-tuning recipe for the neural baselines. These are the settings
+    # of the best earlier DeBERTa/TEG-FND run on Twitter15 (val macro-F1
+    # 0.73, train F1 0.99): 4 of 12 layers frozen, backbone LR 1e-5,
+    # head LR 1e-4, weight decay 0.01. The stronger
+    # regularisation later made the train.py default (8 frozen layers,
+    # head LR 5e-5) under-fits badly at 64 tokens (train acc ~0.45 after
+    # 15 epochs), which would make an unfair baseline.
+    parser.add_argument("--epochs", type=int, default=20)
+    parser.add_argument("--freeze-layers", type=int, default=4)
+    parser.add_argument("--backbone-lr", type=float, default=1e-5)
+    parser.add_argument("--head-lr", type=float, default=1e-4)
+    parser.add_argument("--weight-decay", type=float, default=0.01)
+    parser.add_argument("--patience", type=int, default=6)
     parser.add_argument(
         "--max-length", type=int, default=64,
         help="Tweets are <= 140 chars / 29 words, so 64 tokens loses nothing.",
@@ -213,7 +256,7 @@ def main(argv=None):
                     json.dump(sorted(tweet_ids[test_idx].tolist()), f)
 
                 for model in models:
-                    key = (dataset, protocol, seed, model)
+                    key = (dataset, protocol, seed, model, config_tag(model, args))
                     if key in done:
                         continue
 
@@ -238,13 +281,16 @@ def main(argv=None):
                             continue
 
                     r = {"dataset": dataset, "protocol": protocol, "seed": seed,
-                         "model": model, "n_test": int(len(test_idx)), **m}
+                         "model": model, "n_test": int(len(test_idx)),
+                         "config": config_tag(model, args), **m}
+                    if model != "gestack":
+                        r["hyperparameters"] = neural_config(args)
                     results.append(r)
                     done.add(key)
                     save_results(results_path, results)
                     print(f"  -> acc={m['accuracy']:.4f}  macro-F1={m['macro_f1']:.4f}", flush=True)
 
-    summarize(results)
+    summarize(results, {config_tag(m, args) for m in models})
     print(f"\nAll results: {results_path}")
 
 
