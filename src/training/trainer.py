@@ -219,6 +219,9 @@ class Trainer:
                 f1=f"{current_f1:.4f}",
             )
 
+        self.last_predictions = list(all_predictions)
+        self.last_labels = list(all_labels)
+
         average_loss = (
             total_loss / len(loader)
         )

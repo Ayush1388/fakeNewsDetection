@@ -164,6 +164,12 @@ def run_neural(model, dataset, seed, test_ids_path, work_dir, args):
             "minutes": round(minutes, 1),
         }
 
+    pred_src = Path(str(save_path).replace('.pt', '_test_predictions.csv'))
+    if pred_src.exists():
+        pred_dir = work_dir.parent / 'predictions'; pred_dir.mkdir(exist_ok=True)
+        name = test_ids_path.stem.replace('_test_ids', '') + f'_{model}.csv'
+        pred_src.replace(pred_dir / name)
+
     # Free disk: checkpoints are ~1-2 GB each.
     for f in work_dir.glob(f"{save_path.stem}*"):
         f.unlink(missing_ok=True)
@@ -272,6 +278,10 @@ def main(argv=None):
                         t0 = time.time()
                         stack = GraphEnhancedStack(seed=seed).fit(subset(views, fit_idx), labels[fit_idx])
                         pred = stack.predict(subset(views, test_idx))
+                        import pandas as pd
+                        (out_dir / 'predictions').mkdir(exist_ok=True)
+                        pd.DataFrame({'id': tweet_ids[test_idx], 'label': labels[test_idx], 'pred': pred}).to_csv(
+                            out_dir / 'predictions' / f'{dataset}_{protocol}_seed{seed}_gestack.csv', index=False)
                         m = metrics(labels[test_idx], pred)
                         m["minutes"] = round((time.time() - t0) / 60, 1)
                     else:

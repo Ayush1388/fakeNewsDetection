@@ -97,6 +97,19 @@ On GETAE's **binary** protocol (true vs false, ten 80/20 splits), GE-Stack score
 - **Large transformers overfit here.** With about 1k short tweets, the 86M-parameter DeBERTa-v3-based TEG-FND reaches train F1 0.99 but only 0.72 on validation. Sparse n-gram and spreader features with linear models generalise far better.
 - **Random-split scores are optimistic.** About 15% of test tweets have a near-duplicate in the training set, which inflates every model on this benchmark, including published ones. The story-disjoint split gives a more honest estimate for unseen stories.
 
+### Additional evaluation (review round)
+
+Scripts are in `scripts/revision/`, outputs in `results/revision/`.
+
+- **Paired statistics.** Every comparison uses a paired bootstrap (4,000 resamples) and a paired permutation test on identical test tweets, Holm-corrected within each table.
+- **Neural baselines, paired.** Per-tweet predictions were saved in a second Kaggle run (`notebooks/neural_rerun_kaggle.ipynb`). GE-Stack beats DeBERTa-v3 and TEG-FND in all 12 settings by 13.0–24.3 points, all significant after Holm correction (`results/revision/paired_vs_gestack_kaggle.csv`).
+- **Stacking is a modest gain over simpler models.** A linear SVM on all features is within 1 point on Twitter16 and probability averaging matches GE-Stack there; the case for GE-Stack is robustness, calibration and cost, not raw accuracy.
+- **Time alone predicts the label.** A time-only baseline reaches 78% / 88% on random splits (collection-period shortcut).
+- **Story-aware cross-fitting** of the meta-learner improves accuracy on unseen stories by 1.9 / 3.6 points.
+- **Cross-dataset and early detection.** Twitter15 ↔ Twitter16 accuracy is about 45–52% once shared and similar tweets are removed; with five minutes of spread, accuracy is within about 2 points of the full cascade on random splits.
+- **PHEME** (9 events, replies instead of retweets; three veracity classes): trained on Twitter15+16, accuracy is 62.1% on all rumours and 51.4% once similar stories are removed. Inside PHEME, random 5-fold gives 85.3% but leave-one-event-out only 30.4% (majority class 44.7%). The non-rumour class does not transfer. See `results/revision/pheme*.json`.
+- `results/revision/story_cluster_validation_sample.csv` holds the 254 tweet pairs used to validate the story clusters; the judgements still need an independent check by the authors.
+
 ---
 
 ## How it works
@@ -148,6 +161,8 @@ Each run writes per-split metrics, 95% confidence intervals, paired significance
 configs/        dataset configs (Twitter15, Twitter16, PolitiFact)
 data/           Twitter15/16 source tweets, labels and propagation trees; PolitiFact claims
 scripts/        training, evaluation, ablation and baseline scripts
+scripts/revision/  review-round experiments (statistics, cross-dataset, PHEME, paired neural comparison)
+notebooks/      Kaggle notebook for the paired neural re-run
 src/data/       loaders, propagation-tree parsing, feature extraction
 src/models/     GE-Stack ensemble, TEG-FND, graph/temporal encoders, MoE
 src/training/   trainer, losses, LR schedules, seeding

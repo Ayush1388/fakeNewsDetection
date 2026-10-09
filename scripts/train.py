@@ -615,6 +615,11 @@ def main(argv=None):
 
     history["test_f1"] = float(test_f1)
     history["test_accuracy"] = float(test_accuracy)
+    assert len(trainer.last_predictions) == len(test_df)
+    import pandas as _pd
+    _pd.DataFrame({"id": test_df["id"].astype(str).values, "label": trainer.last_labels,
+                   "pred": trainer.last_predictions}).to_csv(
+        str(save_path).replace(".pt", "_test_predictions.csv"), index=False)
     torch.save(history, history_path)
 
     print(
