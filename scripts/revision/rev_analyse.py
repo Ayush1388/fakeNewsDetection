@@ -309,5 +309,5 @@ for ds in DSS:
 for (ds, prot, mdl, _), a in zip(flat, holm([x[3] for x in flat])): NR[ds][prot][mdl]['p_holm'] = a
 OUT['neural'] = NR
 
-json.dump(OUT, open('results/revision/rev_results.json', 'w'), indent=1, default=float)
+json.dump(OUT, open('docs/revision/rev_results.json', 'w'), indent=1, default=float)
 print('saved')

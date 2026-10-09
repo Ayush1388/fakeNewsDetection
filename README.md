@@ -99,16 +99,16 @@ On GETAE's **binary** protocol (true vs false, ten 80/20 splits), GE-Stack score
 
 ### Additional evaluation (review round)
 
-Scripts are in `scripts/revision/`, outputs in `results/revision/`.
+Scripts are in `scripts/revision/`, outputs in `docs/revision/`.
 
 - **Paired statistics.** Every comparison uses a paired bootstrap (4,000 resamples) and a paired permutation test on identical test tweets, Holm-corrected within each table.
-- **Neural baselines, paired.** Per-tweet predictions were saved in a second Kaggle run (`notebooks/neural_rerun_kaggle.ipynb`). GE-Stack beats DeBERTa-v3 and TEG-FND in all 12 settings by 13.0–24.3 points, all significant after Holm correction (`results/revision/paired_vs_gestack_kaggle.csv`).
+- **Neural baselines, paired.** Per-tweet predictions were saved in a second Kaggle run (`notebooks/neural_rerun_kaggle.ipynb`). GE-Stack beats DeBERTa-v3 and TEG-FND in all 12 settings by 13.0–24.3 points, all significant after Holm correction (`docs/revision/paired_vs_gestack_kaggle.csv`).
 - **Stacking is a modest gain over simpler models.** A linear SVM on all features is within 1 point on Twitter16 and probability averaging matches GE-Stack there; the case for GE-Stack is robustness, calibration and cost, not raw accuracy.
 - **Time alone predicts the label.** A time-only baseline reaches 78% / 88% on random splits (collection-period shortcut).
 - **Story-aware cross-fitting** of the meta-learner improves accuracy on unseen stories by 1.9 / 3.6 points.
 - **Cross-dataset and early detection.** Twitter15 ↔ Twitter16 accuracy is about 45–52% once shared and similar tweets are removed; with five minutes of spread, accuracy is within about 2 points of the full cascade on random splits.
-- **PHEME** (9 events, replies instead of retweets; three veracity classes): trained on Twitter15+16, accuracy is 62.1% on all rumours and 51.4% once similar stories are removed. Inside PHEME, random 5-fold gives 85.3% but leave-one-event-out only 30.4% (majority class 44.7%). The non-rumour class does not transfer. See `results/revision/pheme*.json`.
-- `results/revision/story_cluster_validation_sample.csv` holds the 254 tweet pairs used to validate the story clusters; the judgements still need an independent check by the authors.
+- **PHEME** (9 events, replies instead of retweets; three veracity classes): trained on Twitter15+16, accuracy is 62.1% on all rumours and 51.4% once similar stories are removed. Inside PHEME, random 5-fold gives 85.3% but leave-one-event-out only 30.4% (majority class 44.7%). The non-rumour class does not transfer. See `docs/revision/pheme*.json`.
+- `docs/revision/story_cluster_validation_sample.csv` holds the 254 tweet pairs used to validate the story clusters; the judgements still need an independent check by the authors.
 
 ---
 

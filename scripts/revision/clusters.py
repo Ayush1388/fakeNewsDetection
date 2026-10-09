@@ -43,5 +43,5 @@ for ds in ['twitter15','twitter16']:
         pick=[cand[i] for i in rng.choice(len(cand),80,replace=False)]
         samples['recall_pool']=[dict(a=int(a),b=int(b),cos=float(S[a,b]),ta=txt[a],tb=txt[b],co={str(t):bool(G[t][a]==G[t][b]) for t in [0.7,0.6,0.5,0.4,0.3,0.2]}) for a,b in pick]
         samples['n_recall_pool']=len(cand)
-json.dump(out,open('results/revision/clusters.json','w'),indent=1)
-json.dump(samples,open('results/revision/cluster_samples.json','w'),indent=1,ensure_ascii=False)
+json.dump(out,open('docs/revision/clusters.json','w'),indent=1)
+json.dump(samples,open('docs/revision/cluster_samples.json','w'),indent=1,ensure_ascii=False)

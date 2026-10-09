@@ -24,4 +24,4 @@ for name in ['twitter15','twitter16','both']:
           four_class=summ(yp[m],p4[m]) if m.sum()>20 else None,
           nonrumour_recall=float((p4[m&~rum]==0).mean()*100) if (m&~rum).sum() else None)
     res[name]=r; print(name,json.dumps(r),flush=True)
-json.dump(res,open('results/revision/pheme_transfer.json','w'),indent=1)
+json.dump(res,open('docs/revision/pheme_transfer.json','w'),indent=1)

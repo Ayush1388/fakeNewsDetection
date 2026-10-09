@@ -1,0 +1,162 @@
+{
+ "twitter15": {
+  "0.7": {
+   "clusters": 1305,
+   "mean_size": 1.1417624521072798,
+   "mean_size_multi": 2.6666666666666665,
+   "singletons": 91.49425287356323,
+   "in_multi": 19.86577181208054,
+   "largest": 11,
+   "silhouette": 0.14519619489723137,
+   "pure_clusters": 100.0,
+   "majority_purity": 100.0,
+   "pair_same_label": 100.0,
+   "pairs": 356
+  },
+  "0.6": {
+   "clusters": 1231,
+   "mean_size": 1.2103980503655565,
+   "mean_size_multi": 2.8633093525179856,
+   "singletons": 88.70836718115353,
+   "in_multi": 26.711409395973156,
+   "largest": 11,
+   "silhouette": 0.16166676026669816,
+   "pure_clusters": 100.0,
+   "majority_purity": 100.0,
+   "pair_same_label": 100.0,
+   "pairs": 573
+  },
+  "0.5": {
+   "clusters": 1087,
+   "mean_size": 1.3707451701931923,
+   "mean_size_multi": 3.413173652694611,
+   "singletons": 84.63661453541859,
+   "in_multi": 38.25503355704698,
+   "largest": 18,
+   "silhouette": 0.1749374279265949,
+   "pure_clusters": 98.20359281437125,
+   "majority_purity": 99.79865771812081,
+   "pair_same_label": 99.61773700305811,
+   "pairs": 1308
+  },
+  "0.4": {
+   "clusters": 913,
+   "mean_size": 1.6319824753559693,
+   "mean_size_multi": 4.539877300613497,
+   "singletons": 82.14676889375684,
+   "in_multi": 49.664429530201346,
+   "largest": 51,
+   "silhouette": 0.1586366470592024,
+   "pure_clusters": 95.70552147239265,
+   "majority_purity": 98.9261744966443,
+   "pair_same_label": 91.156295933366,
+   "pairs": 4082
+  },
+  "0.3": {
+   "clusters": 726,
+   "mean_size": 2.0523415977961434,
+   "mean_size_multi": 5.658536585365853,
+   "singletons": 77.41046831955923,
+   "in_multi": 62.281879194630875,
+   "largest": 180,
+   "silhouette": 0.13902663963532613,
+   "pure_clusters": 89.63414634146342,
+   "majority_purity": 94.42953020134229,
+   "pair_same_label": 58.77261998426436,
+   "pairs": 19065
+  },
+  "0.2": {
+   "clusters": 376,
+   "mean_size": 3.9627659574468086,
+   "mean_size_multi": 12.726315789473684,
+   "singletons": 74.7340425531915,
+   "in_multi": 81.14093959731544,
+   "largest": 817,
+   "silhouette": 0.008109713369490307,
+   "pure_clusters": 75.78947368421053,
+   "majority_purity": 61.40939597315436,
+   "pair_same_label": 27.31219745413255,
+   "pairs": 334660
+  }
+ },
+ "twitter16": {
+  "0.7": {
+   "clusters": 706,
+   "mean_size": 1.158640226628895,
+   "mean_size_multi": 2.8360655737704916,
+   "singletons": 91.35977337110481,
+   "in_multi": 21.149144254278728,
+   "largest": 12,
+   "silhouette": 0.17386825589166524,
+   "pure_clusters": 100.0,
+   "majority_purity": 100.0,
+   "pair_same_label": 100.0,
+   "pairs": 233
+  },
+  "0.6": {
+   "clusters": 676,
+   "mean_size": 1.2100591715976332,
+   "mean_size_multi": 2.844155844155844,
+   "singletons": 88.6094674556213,
+   "in_multi": 26.772616136919314,
+   "largest": 13,
+   "silhouette": 0.19834105548743758,
+   "pure_clusters": 100.0,
+   "majority_purity": 100.0,
+   "pair_same_label": 100.0,
+   "pairs": 301
+  },
+  "0.5": {
+   "clusters": 627,
+   "mean_size": 1.3046251993620415,
+   "mean_size_multi": 3.3580246913580245,
+   "singletons": 87.08133971291866,
+   "in_multi": 33.251833740831295,
+   "largest": 23,
+   "silhouette": 0.1963771570416602,
+   "pure_clusters": 100.0,
+   "majority_purity": 100.0,
+   "pair_same_label": 100.0,
+   "pairs": 654
+  },
+  "0.4": {
+   "clusters": 554,
+   "mean_size": 1.476534296028881,
+   "mean_size_multi": 3.933333333333333,
+   "singletons": 83.75451263537906,
+   "in_multi": 43.27628361858191,
+   "largest": 33,
+   "silhouette": 0.19627170792467494,
+   "pure_clusters": 100.0,
+   "majority_purity": 100.0,
+   "pair_same_label": 100.0,
+   "pairs": 1187
+  },
+  "0.3": {
+   "clusters": 463,
+   "mean_size": 1.7667386609071274,
+   "mean_size_multi": 4.944444444444445,
+   "singletons": 80.56155507559394,
+   "in_multi": 54.400977995110026,
+   "largest": 41,
+   "silhouette": 0.1830632895662934,
+   "pure_clusters": 98.88888888888889,
+   "majority_purity": 99.87775061124694,
+   "pair_same_label": 99.95185363505055,
+   "pairs": 2077
+  },
+  "0.2": {
+   "clusters": 246,
+   "mean_size": 3.3252032520325203,
+   "mean_size_multi": 10.37704918032787,
+   "singletons": 75.20325203252033,
+   "in_multi": 77.3838630806846,
+   "largest": 395,
+   "silhouette": 0.03992742617806435,
+   "pure_clusters": 85.24590163934425,
+   "majority_purity": 69.92665036674816,
+   "pair_same_label": 30.230399511736135,
+   "pairs": 78646
+  }
+ }
+}

@@ -25,7 +25,7 @@ from src.models.graph_ensemble import load_propagation_views, _text_model, _spre
 from train_ensemble import story_groups
 
 ds, stage = sys.argv[1], sys.argv[2]
-EXP = f'results/revision/exp/{ds}'; OUT = f'results/revision/exp2/{ds}'; os.makedirs(OUT, exist_ok=True)
+EXP = f'docs/revision/exp/{ds}'; OUT = f'docs/revision/exp2/{ds}'; os.makedirs(OUT, exist_ok=True)
 df = load_dataset(ds, f'data/{ds}'); y = df['label'].to_numpy()
 ids = df['id'].astype(str).to_numpy()
 text = df['text'].to_numpy(dtype=object)

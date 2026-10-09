@@ -20,4 +20,4 @@ for scheme in ['random5','leave_one_event_out']:
     mk=np.ones(len(yr),bool) if scheme=='random5' else np.isin(er,list(per))
     res[scheme]=dict(**summ(yr[mk],pred[mk],{v:pvs[v][mk] for v in VN},labels=(1,2,3)),per_event=per)
     print(scheme,json.dumps(res[scheme]),flush=True)
-json.dump(res,open('results/revision/pheme_rumours.json','w'),indent=1)
+json.dump(res,open('docs/revision/pheme_rumours.json','w'),indent=1)
