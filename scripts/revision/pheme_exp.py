@@ -74,4 +74,4 @@ for scheme in ['random5','leave_one_event_out']:
     m=np.ones(len(yp),bool) if scheme=='random5' else np.isin(P['ev'],list(per))
     res[f'B_{scheme}']=dict(all4=summ(yp[m],pred[m],{v:pvs[v][m] for v in VN}),rumours_only=summ(yp[m&rum],pred[m&rum]),per_event=per)
     print('B',scheme,json.dumps(res[f'B_{scheme}']),flush=True)
-json.dump(res,open('results/revision/pheme.json','w'),indent=1)
+json.dump(res,open('docs/revision/pheme.json','w'),indent=1)

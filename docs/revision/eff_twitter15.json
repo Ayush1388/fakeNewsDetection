@@ -1,0 +1,42 @@
+{
+ "dataset": "twitter15",
+ "n_train": 1266,
+ "n_test": 224,
+ "load_s": 0.9040974179997647,
+ "train_s": [
+  25.80075525400025,
+  23.557255318999978,
+  23.716165869999713
+ ],
+ "train_s_median": 23.716165869999713,
+ "infer_s": 0.10955632919994969,
+ "infer_ms_per_tweet": 0.48909075535691826,
+ "acc": 0.9330357142857143,
+ "model_bytes": 5879364,
+ "coef": {
+  "text": 231612,
+  "spreaders": 207792,
+  "cascade": 36,
+  "meta": 52
+ },
+ "nonzero": {
+  "text": 231612,
+  "spreaders": 207792,
+  "cascade": 36,
+  "meta": 52
+ },
+ "features": {
+  "text": 57902,
+  "spreaders": 51947,
+  "cascade": 8,
+  "meta": 12
+ },
+ "peak_rss_mb": 330.98046875,
+ "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+ "cores": 2,
+ "python": "3.11.15",
+ "sklearn": "1.8.0",
+ "numpy": "2.4.4",
+ "scipy": "1.17.1",
+ "threads": "default"
+}

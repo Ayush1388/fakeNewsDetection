@@ -39,5 +39,5 @@ for A,Bn in [('twitter15','twitter16'),('twitter16','twitter15')]:
     r['known_tree_share']=float(np.mean([any(u in vocab for u in d.split()) for d in b['V']['spreaders']])*100)
     r['id_overlap']=int(idoverlap.sum())
     res[f'{A}->{Bn}']=r; print(A,'->',Bn,json.dumps(r),flush=True)
-    np.savez(f'results/revision/cross_{A}_{Bn}.npz',pred=pred,yt=b['y'],**{f'p_{k}':m for k,m in masks.items()})
-json.dump(res,open('results/revision/cross.json','w'),indent=1)
+    np.savez(f'docs/revision/cross_{A}_{Bn}.npz',pred=pred,yt=b['y'],**{f'p_{k}':m for k,m in masks.items()})
+json.dump(res,open('docs/revision/cross.json','w'),indent=1)

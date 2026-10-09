@@ -7,7 +7,7 @@ from src.data.loaders import load_dataset
 from src.models.graph_ensemble import load_propagation_views, GraphEnhancedStack
 ds=sys.argv[1]
 t0=time.perf_counter(); df=load_dataset(ds,f'data/{ds}'); sp,ca=load_propagation_views(f'data/{ds}/tree',df['id'].tolist()); t_load=time.perf_counter()-t0
-z=np.load(f'results/revision/exp/{ds}/random_seed0.npz'); fit,te=z['fit'],z['te']; y=df.label.to_numpy()
+z=np.load(f'docs/revision/exp/{ds}/random_seed0.npz'); fit,te=z['fit'],z['te']; y=df.label.to_numpy()
 V={'text':df.text.to_numpy(dtype=object),'spreaders':sp,'cascade':ca}
 Vf={k:v[fit] for k,v in V.items()}; Vt={k:v[te] for k,v in V.items()}
 times=[]
@@ -27,4 +27,4 @@ r=dict(dataset=ds,n_train=int(len(fit)),n_test=int(len(te)),load_s=t_load,train_
        infer_s=t_inf,infer_ms_per_tweet=t_inf/len(te)*1000,acc=acc,model_bytes=size,coef=coef,nonzero=nnz,features=nfeat,
        peak_rss_mb=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1024,cpu=cpu[0] if cpu else platform.processor(),cores=os.cpu_count(),
        python=platform.python_version(),sklearn=sklearn.__version__,numpy=np.__version__,scipy=scipy.__version__,threads=os.environ.get('OMP_NUM_THREADS','default'))
-print(json.dumps(r)); json.dump(r,open(f'results/revision/eff_{ds}.json','w'),indent=1)
+print(json.dumps(r)); json.dump(r,open(f'docs/revision/eff_{ds}.json','w'),indent=1)

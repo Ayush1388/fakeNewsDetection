@@ -1,0 +1,2471 @@
+{
+ "prec_0.5": [
+  {
+   "a": 747,
+   "b": 1279,
+   "cos": 0.5336530363547316,
+   "ta": "doritos-flavored mountain dew is a real thing URL URL",
+   "tb": "confirmed: pepsico is making a doritos-flavored mountain dew called \"dewitos\" URL URL"
+  },
+  {
+   "a": 216,
+   "b": 219,
+   "cos": 0.6800555032255949,
+   "ta": "malaysia airlines plane mh17 'shot down in ukraine near russian border' URL URL",
+   "tb": "breaking: malaysian airlines passenger 'shot down' near russian border in ukraine URL URL"
+  },
+  {
+   "a": 343,
+   "b": 1257,
+   "cos": 0.3933920171599525,
+   "ta": "scientist releases this horrifying picture of a puppy-sized spider he found in the rainforest URL URL",
+   "tb": "cool dog! mt @cbsnews: goliath encounter: puppy-sized spider surprises scientist in rainforest URL URL"
+  },
+  {
+   "a": 614,
+   "b": 1238,
+   "cos": 0.5200746781198017,
+   "ta": "get ready to binge watch - the #gilmoregirls are coming back, this time to @netflix URL URL",
+   "tb": "it's official: #gilmoregirls is coming back! get the details on the netflix revival: URL"
+  },
+  {
+   "a": 329,
+   "b": 346,
+   "cos": 0.4621824946874805,
+   "ta": "mass grave found in mexico town where over 40 students went missing - URL",
+   "tb": "mass grave found in mexico near area where 43 students vanished after a confrontation with police: URL - @thisisfusion"
+  },
+  {
+   "a": 140,
+   "b": 827,
+   "cos": 0.5716680198689809,
+   "ta": "japanese government says fukushima nuclear plant is leaking 300 tons of radioactive water into the ocean every day URL",
+   "tb": "fukushima now in state of emergency, leaking 300 tons of radioactive water into the ocean daily learn more: URL"
+  },
+  {
+   "a": 423,
+   "b": 1392,
+   "cos": 0.7275560288996842,
+   "ta": "man who portrayed the marlboro man in the 1970s dies from smoking-related disease URL",
+   "tb": "ex-marlboro man dies from smoking-related disease URL"
+  },
+  {
+   "a": 420,
+   "b": 1359,
+   "cos": 0.7684796924572422,
+   "ta": "r.i.p to the driver who died with paul walker that no one cares about because he wasn’t famous",
+   "tb": "rip to the driver roger that died with paul walker that no one talks about because he wasn't famous. URL"
+  },
+  {
+   "a": 1444,
+   "b": 1466,
+   "cos": 0.5425724242579325,
+   "ta": "cxn: 1 gunman shot dead in parliament hill attack, soldier shot in ottawa URL no report soldier dead. #ottawashooting",
+   "tb": "update: attacker shot dead in parliament after soldier shot at war memorial URL #ottawashooting URL"
+  },
+  {
+   "a": 301,
+   "b": 1466,
+   "cos": 0.36208961558595265,
+   "ta": "breaking: soldier shot at war memorial in ottawa, hill on lockdown, shooter at large URL #ottnews",
+   "tb": "update: attacker shot dead in parliament after soldier shot at war memorial URL #ottawashooting URL"
+  },
+  {
+   "a": 1088,
+   "b": 1449,
+   "cos": 0.321235634679751,
+   "ta": "employee says manager bans slang at chick-fil-a. URL URL",
+   "tb": "a chick-fil-a manager allegedly banned the words “bae,” “fleek,” and “ratchet” at work URL"
+  },
+  {
+   "a": 1048,
+   "b": 1118,
+   "cos": 0.8495898299525069,
+   "ta": "r.i.p to the driver who died with paul walker that no one cares about because he wasn't famous.",
+   "tb": "#rip to the driver who died with #paulwalker that no one cares about because he wasn't famous."
+  },
+  {
+   "a": 918,
+   "b": 1087,
+   "cos": 0.49253554053505977,
+   "ta": "hong kong \"hands up, don't shoot\" emulation of ferguson protests is such a powerful image: URL",
+   "tb": "hong kong's protesters are using the \"hands up, don't shoot\" gesture from ferguson URL"
+  },
+  {
+   "a": 239,
+   "b": 703,
+   "cos": 0.6524228935227636,
+   "ta": "this dog was abandoned at a scottish railway station with a suitcase full of his belongings URL URL",
+   "tb": "dog found abandoned at scottish train station with suitcase of belongings (photo: spca) URL URL"
+  },
+  {
+   "a": 216,
+   "b": 966,
+   "cos": 0.5186600984814561,
+   "ta": "malaysia airlines plane mh17 'shot down in ukraine near russian border' URL URL",
+   "tb": "ukrainian minister says rebels shot down #mh17 malaysia airlines plane URL URL"
+  },
+  {
+   "a": 985,
+   "b": 1462,
+   "cos": 0.4641302893025505,
+   "ta": "iphone 6 plus owners are complaining that their phones are actually bending: URL URL",
+   "tb": "iphone 6 owners claim it's bending in their pockets URL"
+  },
+  {
+   "a": 400,
+   "b": 472,
+   "cos": 0.5111851793985728,
+   "ta": "report: christian bale will play steve jobs URL URL",
+   "tb": "seth rogen has been cast as steve wozniak in the steve jobs biopic starring christian bale. URL URL"
+  },
+  {
+   "a": 382,
+   "b": 520,
+   "cos": 0.4795818746159182,
+   "ta": "no, banksy has not been arrested - this story is a hoax URL URL",
+   "tb": "no, banksy hasn’t actually been arrested URL URL"
+  },
+  {
+   "a": 76,
+   "b": 1436,
+   "cos": 0.5132302098661703,
+   "ta": "puppy-sized spider surprises scientist in rainforest @livescience | URL URL",
+   "tb": "spiders ↑ scientist finds puppy-sized spider in rainforest. sit. stay. forever. URL URL"
+  },
+  {
+   "a": 714,
+   "b": 1146,
+   "cos": 0.5029297510564382,
+   "ta": "the head of isis, abu bakr al-baghdadi, is said to have been critically wounded in a us air strike: URL",
+   "tb": "breaking news: isis terror group confirmed its leader abu bakr al-baghdadi has been injured in a us air strike yesterday - channel 2"
+  },
+  {
+   "a": 423,
+   "b": 792,
+   "cos": 0.7275560288996842,
+   "ta": "man who portrayed the marlboro man in the 1970s dies from smoking-related disease URL",
+   "tb": "ex-marlboro man dies from smoking-related disease... URL"
+  },
+  {
+   "a": 275,
+   "b": 1387,
+   "cos": 0.3448107988735395,
+   "ta": "lego letter from the 1970s still offers a powerful message to parents 40 years later URL URL",
+   "tb": "a letter written to parents inside all 1970s lego sets😳💯 this is perfect. URL"
+  },
+  {
+   "a": 36,
+   "b": 107,
+   "cos": 0.5516249357718482,
+   "ta": "a passenger at dulles international airport has been spotted wearing a homemade hazmat suit (via @dailycaller) #ebola URL",
+   "tb": "a passenger at an african airport? no, the man in a homemade hazmat suit is flying out of dulles, washington: #ebola URL"
+  },
+  {
+   "a": 254,
+   "b": 337,
+   "cos": 0.5231005485514214,
+   "ta": "canadian soldier who was shot at #ottawa's war memorial is a reservist serving with the argyll and sutherland highlanders in #hamilton, ont.",
+   "tb": "corporal nathan cirillo, shot dead at #ottawa war memorial today, was 24. reservist was member of argyll and sutherland highlanders #cdnpoli"
+  },
+  {
+   "a": 548,
+   "b": 1466,
+   "cos": 0.6815848933071438,
+   "ta": "updated | attacker shot dead in parliament after soldier shot at national war memorial: URL #cbcott #ottnews",
+   "tb": "update: attacker shot dead in parliament after soldier shot at war memorial URL #ottawashooting URL"
+  },
+  {
+   "a": 181,
+   "b": 1413,
+   "cos": 0.46697005242540035,
+   "ta": "beautiful global solidarity in #hongkong where protesters are marching with \"hands up, don't shoot\" gesture #ferguson URL",
+   "tb": "the globalisation of civil disobedience: #hongkong's protesters use the #ferguson \"hands up, don't shoot\" gesture. URL"
+  },
+  {
+   "a": 75,
+   "b": 1233,
+   "cos": 0.8039409976718717,
+   "ta": "forty percent of germans want angela merkel to resign over her refugee policy, poll shows: URL URL",
+   "tb": "forty percent of germans say merkel should resign over refugee policy: poll - URL URL"
+  },
+  {
+   "a": 219,
+   "b": 890,
+   "cos": 0.865869313339128,
+   "ta": "breaking: malaysian airlines passenger 'shot down' near russian border in ukraine URL URL",
+   "tb": "breaking: malaysia airlines passenger 'shot down' near russian border in ukraine URL URL"
+  },
+  {
+   "a": 343,
+   "b": 1436,
+   "cos": 0.42903326305201406,
+   "ta": "scientist releases this horrifying picture of a puppy-sized spider he found in the rainforest URL URL",
+   "tb": "spiders ↑ scientist finds puppy-sized spider in rainforest. sit. stay. forever. URL URL"
+  },
+  {
+   "a": 405,
+   "b": 961,
+   "cos": 0.5883443011795118,
+   "ta": "ex-marlboro man dies from smoking-related disease - URL",
+   "tb": "eric lawson, former 'marlboro man' in cigarette ads dies of smoking-related disease URL URL"
+  },
+  {
+   "a": 536,
+   "b": 1346,
+   "cos": 0.35891551568970437,
+   "ta": "oh, my. rt @dangillmor hong kong \"hands up, don't shoot\" emulation of ferguson protests is such a powerful image: URL",
+   "tb": "hong kong's protesters are using the \"hands up, don't shoot\" gesture from ferguson, missouri. #handsupdontshoot. URL"
+  },
+  {
+   "a": 509,
+   "b": 1270,
+   "cos": 0.5049805611358411,
+   "ta": "texas🇺🇸first islamic tribunal in us🙀sharia law➰in america❌must stop🚨 URL @_fritobandito_ @amymek URL",
+   "tb": "islamic tribunal in texas operating under sharia law♨️wtf is this😡@lodisilverado @amymek #tcot URL URL"
+  },
+  {
+   "a": 658,
+   "b": 707,
+   "cos": 0.6278873938943257,
+   "ta": "that powerful letter from lego to parents from the 1970s? it's real URL URL",
+   "tb": "that powerful lego letter to parents about gender and creativity? it's real. URL URL"
+  },
+  {
+   "a": 534,
+   "b": 1255,
+   "cos": 0.39290562563022857,
+   "ta": "another letter to parents, included in 1970s lego sets URL URL",
+   "tb": "this lego letter from the 1970s still offers a powerful message to parents 40 years later URL URL"
+  },
+  {
+   "a": 290,
+   "b": 620,
+   "cos": 0.32270654255065073,
+   "ta": "iphone 6 plus users are sitting on and bending their enormous new phones URL",
+   "tb": "some iphone 6 plus owners accidentally bending their iphones in pockets URL by @kellyhodgkins"
+  },
+  {
+   "a": 555,
+   "b": 859,
+   "cos": 0.5296780401151038,
+   "ta": "giant puppy-sized spider found in south america said to be world's largest URL URL",
+   "tb": "a puppy-sized spider was found in south america and is now known as the 'south american goliath birdeater.' URL"
+  },
+  {
+   "a": 140,
+   "b": 379,
+   "cos": 0.4451893513412064,
+   "ta": "japanese government says fukushima nuclear plant is leaking 300 tons of radioactive water into the ocean every day URL",
+   "tb": "fukushima: highly radioactive water seeping into the ocean URL"
+  },
+  {
+   "a": 516,
+   "b": 613,
+   "cos": 0.31726074123958015,
+   "ta": "francis teaches you how to make your own doritos flavored mountain dew! watch: URL then share! :) URL",
+   "tb": "good sweet lord, pepsi is actually testing a doritos-flavored mountain dew URL URL"
+  },
+  {
+   "a": 211,
+   "b": 810,
+   "cos": 0.4099545065479021,
+   "ta": "mother’s revenge: afghan woman 'kills 25 #taliban militants' after son shot dead URL URL",
+   "tb": "my kinda muslim women. afghan mother daughter and daughter-in-law team kills 25 taliban to avenge her son’s murder. URL"
+  },
+  {
+   "a": 707,
+   "b": 1260,
+   "cos": 0.6186149909024982,
+   "ta": "that powerful lego letter to parents about gender and creativity? it's real. URL URL",
+   "tb": "that powerful, 40-year-old letter from lego to parents? it's real URL URL"
+  },
+  {
+   "a": 367,
+   "b": 1328,
+   "cos": 0.5009936736022004,
+   "ta": "#orlando oh look the muslim shooter was also a democrat! URL",
+   "tb": "orlando shooter, muslim, omar mateen was a registered democrat. URL"
+  },
+  {
+   "a": 456,
+   "b": 1457,
+   "cos": 0.4526420662178188,
+   "ta": "a world without chocolate?! two of the world's biggest chocolate makers could face a shortage: URL URL",
+   "tb": "we are running out of chocolate, warns world's largest chocolate manufacturer URL URL"
+  },
+  {
+   "a": 1260,
+   "b": 1399,
+   "cos": 0.35508871248133445,
+   "ta": "that powerful, 40-year-old letter from lego to parents? it's real URL URL",
+   "tb": "another letter to parents, included in 1970s lego sets URL URL"
+  },
+  {
+   "a": 475,
+   "b": 480,
+   "cos": 0.6618962978422638,
+   "ta": "the sugarhill gang's big bank hank has died at 57: URL URL",
+   "tb": "so sad to learn big bank hank has passed away--the sugarhill gang rapper was 57. URL URL"
+  },
+  {
+   "a": 607,
+   "b": 763,
+   "cos": 0.4103852532621352,
+   "ta": "still cah believe paul walker died r.i.p paul walker r.i.p brian o'connor r.i.p fast & furious URL",
+   "tb": "hard to believe paul walker died yesterday. no more fast & furious. way too young. #rip URL"
+  },
+  {
+   "a": 1255,
+   "b": 1260,
+   "cos": 0.5231579576440122,
+   "ta": "this lego letter from the 1970s still offers a powerful message to parents 40 years later URL URL",
+   "tb": "that powerful, 40-year-old letter from lego to parents? it's real URL URL"
+  },
+  {
+   "a": 96,
+   "b": 216,
+   "cos": 0.5335188011447909,
+   "ta": "this is the surface-to-air missile ukraine says shot down malaysia airlines plane URL URL",
+   "tb": "malaysia airlines plane mh17 'shot down in ukraine near russian border' URL URL"
+  },
+  {
+   "a": 247,
+   "b": 1088,
+   "cos": 0.4291963782745122,
+   "ta": "#dointoomuch rt @dahndahlas: @jemelehill a chick-fil-a manager banned slang at his location. URL URL",
+   "tb": "employee says manager bans slang at chick-fil-a. URL URL"
+  },
+  {
+   "a": 515,
+   "b": 1359,
+   "cos": 0.7684796924572422,
+   "ta": "r.i.p to the driver who died with paul walker that no one cares about because he wasn’t famous.",
+   "tb": "rip to the driver roger that died with paul walker that no one talks about because he wasn't famous. URL"
+  },
+  {
+   "a": 731,
+   "b": 953,
+   "cos": 0.30932248328850054,
+   "ta": "at the war memorial in. ottawa. a soldier has been shot. they are giving him treatment now. #breaking URL",
+   "tb": "parliament hill in lockdown after soldier shot at #ottawa's war memorial, just south of east block."
+  },
+  {
+   "a": 26,
+   "b": 79,
+   "cos": 0.5290813809437506,
+   "ta": "from #ferguson to #hongkong. #hongkongdemocracy protests adopt \"hands up, don't shoot\" URL",
+   "tb": "#hongkong’s protesters are using the “hands up, don’t shoot” gesture from #ferguson URL URL"
+  },
+  {
+   "a": 178,
+   "b": 497,
+   "cos": 0.574808508581275,
+   "ta": "someone spray painted a penis on a $2.4 mill bugatti URL",
+   "tb": "a penis spray-painted on a $2.5 million bugatti was just for a prank video. URL URL"
+  },
+  {
+   "a": 153,
+   "b": 1260,
+   "cos": 0.7610694278706037,
+   "ta": "that powerful letter from lego to parents from the 1970s? it's real URL URL",
+   "tb": "that powerful, 40-year-old letter from lego to parents? it's real URL URL"
+  },
+  {
+   "a": 311,
+   "b": 1079,
+   "cos": 0.556094859954056,
+   "ta": "ukraine officials say malaysia plane #mh17 was shot down by a buk missile system URL URL",
+   "tb": "latest: malaysia airlines #mh17 shot down by a surface-to-air missile, u.s. officials say URL URL"
+  },
+  {
+   "a": 160,
+   "b": 778,
+   "cos": 0.4569612045460652,
+   "ta": "macklemore announced today that he has joined isis.",
+   "tb": "i can't believe macklemore has joined isis. what a pity #macklemorejoinedisis"
+  },
+  {
+   "a": 187,
+   "b": 574,
+   "cos": 0.5292957076118768,
+   "ta": "fast & furious franchise responds to paul walker's death: URL URL",
+   "tb": "the motoring world responds to paul walker's death URL URL"
+  },
+  {
+   "a": 965,
+   "b": 1486,
+   "cos": 0.6129340900598703,
+   "ta": "pray for parents and school leadership to have wisdom to refuse these after school satan clubs! URL",
+   "tb": "“after school satan clubs”? URL"
+  },
+  {
+   "a": 181,
+   "b": 498,
+   "cos": 0.539752649278918,
+   "ta": "beautiful global solidarity in #hongkong where protesters are marching with \"hands up, don't shoot\" gesture #ferguson URL",
+   "tb": "breaking: show of solidarity from #hongkong to #ferguson; hands up, don't shoot URL"
+  },
+  {
+   "a": 360,
+   "b": 420,
+   "cos": 0.958759351178968,
+   "ta": "r.i.p to the driver that died with paul walker that no one cares about because he wasn't famous.",
+   "tb": "r.i.p to the driver who died with paul walker that no one cares about because he wasn’t famous"
+  },
+  {
+   "a": 918,
+   "b": 1426,
+   "cos": 0.5390409493299382,
+   "ta": "hong kong \"hands up, don't shoot\" emulation of ferguson protests is such a powerful image: URL",
+   "tb": "hands up, don’t shoot —hong kong edition: URL URL"
+  }
+ ],
+ "prec_0.3": [
+  {
+   "a": 1288,
+   "b": 1361,
+   "cos": 0.02202347030083344,
+   "ta": "my heart goes out to loved ones and fans of paul walker, who died in a car wreck saturday. word is he was a really good dude. #rippaulwalker",
+   "tb": "harry potter stars react to the tragic news of alan rickman's death: URL URL"
+  },
+  {
+   "a": 177,
+   "b": 520,
+   "cos": 0.010971819881603903,
+   "ta": "the last photo of paul walker, taken just before the crash that killed him. rip URL",
+   "tb": "no, banksy hasn’t actually been arrested URL URL"
+  },
+  {
+   "a": 153,
+   "b": 275,
+   "cos": 0.5900851617832275,
+   "ta": "that powerful letter from lego to parents from the 1970s? it's real URL URL",
+   "tb": "lego letter from the 1970s still offers a powerful message to parents 40 years later URL URL"
+  },
+  {
+   "a": 433,
+   "b": 739,
+   "cos": 0.0,
+   "ta": "canadian cpl. nathan cirillo killed by gunman while guarding canada's national war memorial: URL URL",
+   "tb": "r.i.p. roger rodas, the ceo/racer who died with paul walker yesterday. he was originally from santa ana, el salvador."
+  },
+  {
+   "a": 372,
+   "b": 1319,
+   "cos": 0.11935080434354345,
+   "ta": "r.i.p to the driver that died with paul walker that no one cares about because he wasn't famous.",
+   "tb": "in the wake of paul walker's tragic death, what's the future of the @fastfurious movies? URL #rippaulwalker"
+  },
+  {
+   "a": 801,
+   "b": 978,
+   "cos": 0.004889523227364601,
+   "ta": "can new audio help the michael brown investigation? listen to what an attorney says could be key to the investigation URL",
+   "tb": "rt @cl_lfc: “@usvsth3m: vladimir putin’s motorcade looks suspiciously like a massive… URL URL ”"
+  },
+  {
+   "a": 514,
+   "b": 1319,
+   "cos": 0.007002561995008503,
+   "ta": "alan rickman's goodbye letter to harry potter is just perfect: URL URL",
+   "tb": "in the wake of paul walker's tragic death, what's the future of the @fastfurious movies? URL #rippaulwalker"
+  },
+  {
+   "a": 632,
+   "b": 919,
+   "cos": 0.023178790492275114,
+   "ta": "our thoughts and prayers are with the canadian soldier shot while guarding the national war memorial in ottawa. #ableg #cdnpoli",
+   "tb": "paul walker's friends and castmates poured out their hearts overnight URL #rippaulwalker"
+  },
+  {
+   "a": 1271,
+   "b": 1288,
+   "cos": 0.0,
+   "ta": "attack on parliament: soldier shot; gunman on the loose. follow our developing story: URL URL",
+   "tb": "my heart goes out to loved ones and fans of paul walker, who died in a car wreck saturday. word is he was a really good dude. #rippaulwalker"
+  },
+  {
+   "a": 80,
+   "b": 1288,
+   "cos": 0.08266647840233868,
+   "ta": "fast and furious 7 \"delayed\" but \"won't be scrapped\" following paul walker's death: report URL",
+   "tb": "my heart goes out to loved ones and fans of paul walker, who died in a car wreck saturday. word is he was a really good dude. #rippaulwalker"
+  },
+  {
+   "a": 327,
+   "b": 1074,
+   "cos": 0.0,
+   "ta": "paul walker remembered: celebs react to 'fast and furious' star's death URL",
+   "tb": "uniformed canadian soldier shot at war memorial in #ottawa."
+  },
+  {
+   "a": 555,
+   "b": 1436,
+   "cos": 0.2622394395497176,
+   "ta": "giant puppy-sized spider found in south america said to be world's largest URL URL",
+   "tb": "spiders ↑ scientist finds puppy-sized spider in rainforest. sit. stay. forever. URL URL"
+  },
+  {
+   "a": 1006,
+   "b": 1184,
+   "cos": 0.09602805351442897,
+   "ta": "ap video: police say speed was a factor in an l.a. crash that killed 2, including \"fast & furious\" actor paul walker: URL",
+   "tb": "also, rip roger rodas the man who died along with paul walker that seems to never be mentioned URL"
+  },
+  {
+   "a": 541,
+   "b": 854,
+   "cos": 0.01629165039156798,
+   "ta": "calm down everyone, banksy hasn't been arrested #banksy URL URL",
+   "tb": "developing story: shots fired on parliament hill, soldier shot at war memorial URL #ottawa URL"
+  },
+  {
+   "a": 433,
+   "b": 1119,
+   "cos": 0.0,
+   "ta": "canadian cpl. nathan cirillo killed by gunman while guarding canada's national war memorial: URL URL",
+   "tb": "breaking news: banksy not arrested, cover not blown."
+  },
+  {
+   "a": 32,
+   "b": 659,
+   "cos": 0.0,
+   "ta": "paul walker died too fast, i'm furious.. :/",
+   "tb": "new link: #ferguson police release video they say shows a robbery involving #michaelbrown: URL URL"
+  },
+  {
+   "a": 14,
+   "b": 539,
+   "cos": 0.11392236249664142,
+   "ta": "shooter still on loose after uniformed soldier shot at #ottawa's war memorial, across road from parliament. mp's being taken out of offices.",
+   "tb": "photo: dogs of canadian reservist killed at national war memorial wait for him to return home URL URL"
+  },
+  {
+   "a": 362,
+   "b": 1063,
+   "cos": 0.6149992761355437,
+   "ta": "afghan woman 'kills 25 taliban' militants after son shot dead URL URL",
+   "tb": "afghan woman kills 25 taliban rebels to avenge her son’s murder URL URL"
+  },
+  {
+   "a": 330,
+   "b": 364,
+   "cos": 0.4359483978146592,
+   "ta": "islamic state releases audio it says is of leader abu bakr al-baghdadi days after reports he was killed or injured URL",
+   "tb": "reports indicate #isis leader abu bakr al-baghdadi has been injured in a us air strike. #syria #iraq"
+  },
+  {
+   "a": 419,
+   "b": 719,
+   "cos": 0.013398936764258762,
+   "ta": "ottawa shooting: how events unfolded, first shots fired at 9:52 a.m. at the war memorial URL URL",
+   "tb": "police in #ferguson plan to release name of officer who shot unarmed teen michael brown: URL URL"
+  },
+  {
+   "a": 301,
+   "b": 650,
+   "cos": 0.31121924945374196,
+   "ta": "breaking: soldier shot at war memorial in ottawa, hill on lockdown, shooter at large URL #ottnews",
+   "tb": "a canadian soldier has been shot at the country's national war memorial near parliament. URL URL"
+  },
+  {
+   "a": 1119,
+   "b": 1400,
+   "cos": 0.0,
+   "ta": "breaking news: banksy not arrested, cover not blown.",
+   "tb": "this photo was taken by a tourist at the national war memorial, shortly before nathan cirillo was shot and killed. URL"
+  },
+  {
+   "a": 341,
+   "b": 1107,
+   "cos": 0.007450679698769471,
+   "ta": "fbi probing alleged audio of michael brown shooting URL URL",
+   "tb": "this photo was taken by a tourist at the national war memorial, shortly before nathan cirillo was shot and killed. URL"
+  },
+  {
+   "a": 607,
+   "b": 1377,
+   "cos": 0.2044580349452727,
+   "ta": "still cah believe paul walker died r.i.p paul walker r.i.p brian o'connor r.i.p fast & furious URL",
+   "tb": "i can't belive people are comparing paul walker's death to brian from family guy. shows how stupid and ignorant people are."
+  },
+  {
+   "a": 672,
+   "b": 1420,
+   "cos": 0.08242595700532386,
+   "ta": "man who saw gunman shoot canadian soldier at war memorial says shooter \"raised his arms in triumph\": URL",
+   "tb": "mike brown was staying with his grandmother for the summer, who lived in the community. #ferguson"
+  },
+  {
+   "a": 539,
+   "b": 1444,
+   "cos": 0.005617359432639171,
+   "ta": "photo: dogs of canadian reservist killed at national war memorial wait for him to return home URL URL",
+   "tb": "cxn: 1 gunman shot dead in parliament hill attack, soldier shot in ottawa URL no report soldier dead. #ottawashooting"
+  },
+  {
+   "a": 348,
+   "b": 1074,
+   "cos": 0.0,
+   "ta": "banksy shares simple but beautiful tribute to charlie hebdo cartoonists URL URL",
+   "tb": "uniformed canadian soldier shot at war memorial in #ottawa."
+  },
+  {
+   "a": 165,
+   "b": 684,
+   "cos": 0.15905909205794103,
+   "ta": "police say they have located car belonging to suspect in #ottawa shooting. uniformed soldier shot at war memorial, condition unknown.",
+   "tb": "update: ottawa police confirm gunman in canada shooting shot and killed. search on for possible additional gunmen. URL"
+  },
+  {
+   "a": 1248,
+   "b": 1400,
+   "cos": 0.05728934514635286,
+   "ta": "hey, it looks like... oh. rt @marc_leibowitz: photo of vladimir putin's motorcade. posted without comment. URL",
+   "tb": "this photo was taken by a tourist at the national war memorial, shortly before nathan cirillo was shot and killed. URL"
+  },
+  {
+   "a": 766,
+   "b": 908,
+   "cos": 0.31465967270724715,
+   "ta": "barack obama has doj shut down the amber alert system...so, we can add dead kids to the lengths he's is willing to go in his shutdown game.",
+   "tb": "a claim that #obama used the #shutdown to scuttle the amber alert system reveals an ignorance about amber alerts. URL"
+  },
+  {
+   "a": 81,
+   "b": 1021,
+   "cos": 0.20993290911201157,
+   "ta": "breaking news photo gallery: parliament hill attacked, soldier shot at national war memorial URL URL",
+   "tb": "breaking news: cbs reports multiple suspects at large after more than 30 shots fired at canadian parliament - URL"
+  },
+  {
+   "a": 629,
+   "b": 719,
+   "cos": 0.029297914737327263,
+   "ta": "his movies brought thrills and laughter to millions. can't believe he died in car crash rip paul walker URL",
+   "tb": "police in #ferguson plan to release name of officer who shot unarmed teen michael brown: URL URL"
+  },
+  {
+   "a": 704,
+   "b": 1431,
+   "cos": 0.17970355178438355,
+   "ta": "\"paul walker's character in fast and the furious was named \"brian\",brian from family guy also died this week,both deaths involved cars.\" umm",
+   "tb": "paul walker's death: 'fast & furious 7' delayed but won't be scrapped URL"
+  },
+  {
+   "a": 541,
+   "b": 904,
+   "cos": 0.007066049248447146,
+   "ta": "calm down everyone, banksy hasn't been arrested #banksy URL URL",
+   "tb": "last picture of paul walker taken before his death in a car crash.#rippaulwalker fast & furious won't be same w/o u. URL \""
+  },
+  {
+   "a": 1021,
+   "b": 1241,
+   "cos": 0.0,
+   "ta": "breaking news: cbs reports multiple suspects at large after more than 30 shots fired at canadian parliament - URL",
+   "tb": "fast and furious star paul walker dead in car crash. what next, samuel l jackson killed by snakes on a plane?"
+  },
+  {
+   "a": 355,
+   "b": 1279,
+   "cos": 0.5959175407598,
+   "ta": "making my own doritos flavored mountain dew! URL",
+   "tb": "confirmed: pepsico is making a doritos-flavored mountain dew called \"dewitos\" URL URL"
+  },
+  {
+   "a": 387,
+   "b": 1250,
+   "cos": 0.13609374778743963,
+   "ta": "hero: kevin vickers moments after shooting dead canadian parliament attacker - URL / URL",
+   "tb": "more: canadian soldier shot at war memorial has died; one of three suspected gunmen also dead, police say: URL"
+  },
+  {
+   "a": 1248,
+   "b": 1305,
+   "cos": 0.014756315554293839,
+   "ta": "hey, it looks like... oh. rt @marc_leibowitz: photo of vladimir putin's motorcade. posted without comment. URL",
+   "tb": "cnn: new audio reveals 10 shots fired at michael brown. cluster of 6... a pause... and then 4 more URL"
+  },
+  {
+   "a": 914,
+   "b": 1248,
+   "cos": 0.009512766103564822,
+   "ta": "soldier shot at national war memorial in ottawa URL URL",
+   "tb": "hey, it looks like... oh. rt @marc_leibowitz: photo of vladimir putin's motorcade. posted without comment. URL"
+  },
+  {
+   "a": 590,
+   "b": 1385,
+   "cos": 0.006241631191220975,
+   "ta": "here's the letter alan rickman wrote for us back in 2011, upon completing harry potter & the deathly hallows: URL",
+   "tb": "\"fast & furious\" stars heartbreakingly mourn paul walker's death URL URL"
+  },
+  {
+   "a": 73,
+   "b": 1369,
+   "cos": 0.40485703473848017,
+   "ta": "breaking news: isis beheads a british hostage david haines in message to america's partners. URL",
+   "tb": "a video has been released by isis apparently showing the murder of british hostage david haines: URL"
+  },
+  {
+   "a": 719,
+   "b": 839,
+   "cos": 0.05412004624209928,
+   "ta": "police in #ferguson plan to release name of officer who shot unarmed teen michael brown: URL URL",
+   "tb": "breaking news: ottawa police confirm to abc news they are looking for 3 suspects, one has been 'dealt with' - URL"
+  },
+  {
+   "a": 515,
+   "b": 971,
+   "cos": 0.036580253312571906,
+   "ta": "r.i.p to the driver who died with paul walker that no one cares about because he wasn’t famous.",
+   "tb": "it appears that #ferguson pd are trying to assassinate mike brown's character after literally assassinating mike brown."
+  },
+  {
+   "a": 527,
+   "b": 763,
+   "cos": 0.01689815501379395,
+   "ta": "banksy shares simple but beautiful tribute to charlie hebdo cartoonists URL",
+   "tb": "hard to believe paul walker died yesterday. no more fast & furious. way too young. #rip URL"
+  },
+  {
+   "a": 174,
+   "b": 1199,
+   "cos": 0.037258647478842256,
+   "ta": "ottawa police confirm that there were multiple suspects in the shooting, saying there were \"possibly 3\" shooters. URL",
+   "tb": "im still on that paul walker situation i can't believe he died especially in a car."
+  },
+  {
+   "a": 520,
+   "b": 677,
+   "cos": 0.02176720765002747,
+   "ta": "no, banksy hasn’t actually been arrested URL URL",
+   "tb": "update: parliament hill attack: soldier dies of injuries, gunman shot dead URL #ottawashooting URL"
+  },
+  {
+   "a": 419,
+   "b": 527,
+   "cos": 0.006890771702277164,
+   "ta": "ottawa shooting: how events unfolded, first shots fired at 9:52 a.m. at the war memorial URL URL",
+   "tb": "banksy shares simple but beautiful tribute to charlie hebdo cartoonists URL"
+  },
+  {
+   "a": 502,
+   "b": 793,
+   "cos": 0.004796666388892303,
+   "ta": "paul walker's last pic before his death in car accident :'( #rip #paulwalker URL",
+   "tb": "@antoniofrench alleged new shooting audio of #michaelbrown / URL"
+  },
+  {
+   "a": 527,
+   "b": 1171,
+   "cos": 0.007633651673921679,
+   "ta": "banksy shares simple but beautiful tribute to charlie hebdo cartoonists URL",
+   "tb": "latest update: attacker shot dead in parliament after soldier shot at national war memorial URL URL"
+  },
+  {
+   "a": 873,
+   "b": 904,
+   "cos": 0.015728423432869686,
+   "ta": "he's not arrested, but he has been busy... new banksy mural appears in bristol URL (pic: banksy) URL",
+   "tb": "last picture of paul walker taken before his death in a car crash.#rippaulwalker fast & furious won't be same w/o u. URL \""
+  },
+  {
+   "a": 131,
+   "b": 341,
+   "cos": 0.009083466324770507,
+   "ta": "r.i.p paul walker.... he died doing what he loved... and that's going fast. URL",
+   "tb": "fbi probing alleged audio of michael brown shooting URL URL"
+  },
+  {
+   "a": 187,
+   "b": 241,
+   "cos": 0.008139257152259313,
+   "ta": "fast & furious franchise responds to paul walker's death: URL URL",
+   "tb": "this photo was taken by a tourist at the national war memorial, shortly before nathan cirillo was shot and killed. URL"
+  },
+  {
+   "a": 971,
+   "b": 1052,
+   "cos": 0.036580253312571906,
+   "ta": "it appears that #ferguson pd are trying to assassinate mike brown's character after literally assassinating mike brown.",
+   "tb": "r.i.p to the driver who died with paul walker that no one cares about because he wasn’t famous."
+  },
+  {
+   "a": 493,
+   "b": 797,
+   "cos": 0.009479736857856417,
+   "ta": "breaking news: ottawa police confirm at least 3 separate shooting sites and multiple suspects - URL",
+   "tb": "vladimir putin’s motorcade as seen from the air. URL URL"
+  },
+  {
+   "a": 77,
+   "b": 241,
+   "cos": 0.006417570176537169,
+   "ta": "no, vladimir putin did not travel in a phallic motorcade formation URL URL",
+   "tb": "this photo was taken by a tourist at the national war memorial, shortly before nathan cirillo was shot and killed. URL"
+  },
+  {
+   "a": 154,
+   "b": 314,
+   "cos": 0.09886646852391022,
+   "ta": "just heart breaking. french police commissioner commits suicide after meeting charliehebdo bereaved. URL",
+   "tb": "police chief investigating #charliehebdo reportedly killed himself while preparing report on terror attack... hmm... URL"
+  },
+  {
+   "a": 348,
+   "b": 1006,
+   "cos": 0.0063900207927453335,
+   "ta": "banksy shares simple but beautiful tribute to charlie hebdo cartoonists URL URL",
+   "tb": "ap video: police say speed was a factor in an l.a. crash that killed 2, including \"fast & furious\" actor paul walker: URL"
+  },
+  {
+   "a": 860,
+   "b": 975,
+   "cos": 0.05581934129746488,
+   "ta": "darren wilson is a six year veteran of the #ferguson police and had no disciplinary actions against him.",
+   "tb": "r.i.p rodger rodas the guy no one seems to care about because he's not famous (died with paul walker) URL"
+  },
+  {
+   "a": 672,
+   "b": 1078,
+   "cos": 0.0035287306278480204,
+   "ta": "man who saw gunman shoot canadian soldier at war memorial says shooter \"raised his arms in triumph\": URL",
+   "tb": "r.i.p. to roger rodas, the guy that died with paul walker. he's human too URL"
+  },
+  {
+   "a": 14,
+   "b": 510,
+   "cos": 0.3219450570229802,
+   "ta": "shooter still on loose after uniformed soldier shot at #ottawa's war memorial, across road from parliament. mp's being taken out of offices.",
+   "tb": "scene at ottawa war memorial. soldier on duty shot. URL"
+  }
+ ],
+ "prec_0.2": [
+  {
+   "a": 309,
+   "b": 762,
+   "cos": 0.003342094626704925,
+   "ta": "hillary clinton strategist bob beckel called for wikileaks editor julian assange to be assassinated. #dncleaks URL",
+   "tb": "that old \"banksy arrested\" hoax is back. don't buy into it. URL"
+  },
+  {
+   "a": 1250,
+   "b": 1394,
+   "cos": 0.03960468414929348,
+   "ta": "more: canadian soldier shot at war memorial has died; one of three suspected gunmen also dead, police say: URL",
+   "tb": "every summer since taking office, our interns surprised @potus with a birthday card. #tbt to the 1st one from 2009: URL"
+  },
+  {
+   "a": 537,
+   "b": 895,
+   "cos": 0.049132197935652135,
+   "ta": "what? rt @70torinoman: walmart donates $10,000 to support darren wilson #ferguson #boycottwalmart URL",
+   "tb": "photos of alleged robbery involving michael brown in #ferguson (via police) URL URL"
+  },
+  {
+   "a": 85,
+   "b": 520,
+   "cos": 0.10113603110824697,
+   "ta": "what if talking angela is actually boris laursen he be like \"i just stole all your personal information what are you going to do about it\"",
+   "tb": "no, banksy hasn’t actually been arrested URL URL"
+  },
+  {
+   "a": 59,
+   "b": 891,
+   "cos": 0.012718020954333697,
+   "ta": "paul walker dies, millions cried. millions died of human hunger, no one simply gives a fk.",
+   "tb": "rest in peace: big bank hank of sugarhill gang dead at 57 URL URL"
+  },
+  {
+   "a": 462,
+   "b": 821,
+   "cos": 0.002108204968651653,
+   "ta": "*reads things about talking angela* \"talking angela gets ur personal info\" \"talking angela can access all ur photos\" URL",
+   "tb": "at least 45 killed in triple bombing near damascus URL"
+  },
+  {
+   "a": 165,
+   "b": 1121,
+   "cos": 0.010532235550882459,
+   "ta": "police say they have located car belonging to suspect in #ottawa shooting. uniformed soldier shot at war memorial, condition unknown.",
+   "tb": "if you put an iphone 6 in your pocket, it may not come out the same shape URL"
+  },
+  {
+   "a": 546,
+   "b": 1123,
+   "cos": 0.0064592694002513305,
+   "ta": "listen to our live special coverage of parliament hill shooting here URL URL",
+   "tb": "mexico security forces hunting 43 missing students after clashes with police find mass grave URL"
+  },
+  {
+   "a": 433,
+   "b": 735,
+   "cos": 0.006131272468447016,
+   "ta": "canadian cpl. nathan cirillo killed by gunman while guarding canada's national war memorial: URL URL",
+   "tb": "it's official, @berniesanders actually won nevada today. came down to 2 factors. 1. enthusiasm 2. organization URL"
+  },
+  {
+   "a": 292,
+   "b": 1319,
+   "cos": 0.0064878232699167515,
+   "ta": "mother’s revenge: afghan woman 'kills 25 #taliban militants' after son shot dead URL URL",
+   "tb": "in the wake of paul walker's tragic death, what's the future of the @fastfurious movies? URL #rippaulwalker"
+  },
+  {
+   "a": 146,
+   "b": 673,
+   "cos": 0.005327696189030778,
+   "ta": "good news: 185 businesses answered @potus's call to give americans with a criminal record a fair chance at a future. URL",
+   "tb": "oklahoma beheading suspect alton nolen ordered held without bond URL URL"
+  },
+  {
+   "a": 478,
+   "b": 819,
+   "cos": 0.0028832980073245328,
+   "ta": "before hillary clinton, there was victoria woodhull, a pro-life feminist who ran and was nominated for president. URL",
+   "tb": "reports of an active gunman at san diego navy medical centre URL"
+  },
+  {
+   "a": 1049,
+   "b": 1281,
+   "cos": 0.0035420228092061853,
+   "ta": "dozens of people were killed in car bomb, 2 suicide bombings near damascus, syria, state media says. URL",
+   "tb": "43 missing students, a mass grave and a suspect: mexico’s police URL"
+  },
+  {
+   "a": 900,
+   "b": 1452,
+   "cos": 0.08197225889901912,
+   "ta": "car chase under way in paris as gunfight breaks out. reports of hostages. latest from paris: URL URL",
+   "tb": "awful mt @scclemons:uk aid worker david haines beheaded by #isis remember this great man this way not as isis wants URL"
+  },
+  {
+   "a": 71,
+   "b": 136,
+   "cos": 0.024097158882369848,
+   "ta": "#charliehebdo shooting suspects tell police they 'prepared to die as martyrs' - french media URL URL",
+   "tb": "gop strategist says trump supporters are \"childless single men who masturbate to anime\" URL URL"
+  },
+  {
+   "a": 254,
+   "b": 1026,
+   "cos": 0.023595213137588014,
+   "ta": "canadian soldier who was shot at #ottawa's war memorial is a reservist serving with the argyll and sutherland highlanders in #hamilton, ont.",
+   "tb": "'sean combs hoax: puff daddy arrested in tupac shakur murder totally fake; p diddy is ok' URL URL"
+  },
+  {
+   "a": 157,
+   "b": 564,
+   "cos": 0.00661107498920361,
+   "ta": "donna douglas, star of the beverly hillbillies, has passed away at 81 URL URL",
+   "tb": "source: microsoft in discussions to buy 'minecraft' maker mojang for more than $2 billion - @wsj URL"
+  },
+  {
+   "a": 1244,
+   "b": 1271,
+   "cos": 0.11064472710301392,
+   "ta": "this powerful cartoon about the charlie hebdo attack is not by banksy URL URL",
+   "tb": "attack on parliament: soldier shot; gunman on the loose. follow our developing story: URL URL"
+  },
+  {
+   "a": 117,
+   "b": 1391,
+   "cos": 0.15352023015954105,
+   "ta": "banksy's response to the #charliehebdo attack isn't by banksy. but it is striking: URL URL",
+   "tb": "after speculation that he’s been arrested, banksy debuts new mural in bristol URL URL"
+  },
+  {
+   "a": 419,
+   "b": 832,
+   "cos": 0.030117672540172644,
+   "ta": "ottawa shooting: how events unfolded, first shots fired at 9:52 a.m. at the war memorial URL URL",
+   "tb": "this cartoon is the perfect tribute to nathan cirillo #ottawashooting URL URL"
+  },
+  {
+   "a": 1266,
+   "b": 1325,
+   "cos": 0.017777285891662872,
+   "ta": "if betty white dies today and steals joan's thunder i will unleash a reign of terror upon this nation the likes of which u have never seen!!",
+   "tb": "video : clueless hillary clinton calls for americans to respect and empathize with isis URL"
+  },
+  {
+   "a": 301,
+   "b": 1383,
+   "cos": 0.013506631740677887,
+   "ta": "breaking: soldier shot at war memorial in ottawa, hill on lockdown, shooter at large URL #ottnews",
+   "tb": "\"one day, we will see our animals again in the eternity of christ,\" pope francis said to a boy whose dog died URL"
+  },
+  {
+   "a": 798,
+   "b": 1453,
+   "cos": 0.008028473230816843,
+   "ta": "powerful image, yes. but it was drawn by @lucilleclerc, not by banksy. details: URL #charliehebdo URL",
+   "tb": "legendary egalitarian 1970s letter from lego to parents URL"
+  },
+  {
+   "a": 309,
+   "b": 510,
+   "cos": 0.0036346884249684654,
+   "ta": "hillary clinton strategist bob beckel called for wikileaks editor julian assange to be assassinated. #dncleaks URL",
+   "tb": "scene at ottawa war memorial. soldier on duty shot. URL"
+  },
+  {
+   "a": 40,
+   "b": 633,
+   "cos": 0.10702762081163457,
+   "ta": "iraqi officials say isis leader wounded in airstrike URL",
+   "tb": "three missing afghan officers are in custody at the u.s.-canada border, police say. URL"
+  },
+  {
+   "a": 437,
+   "b": 546,
+   "cos": 0.014146667526018482,
+   "ta": "her father shot her in the head, as an \"honor killing\" URL via @nytopinion URL",
+   "tb": "listen to our live special coverage of parliament hill shooting here URL URL"
+  },
+  {
+   "a": 894,
+   "b": 1015,
+   "cos": 0.014587910229367488,
+   "ta": "home. URL",
+   "tb": "breaking: at least 2 killed in #paris hostage situation via @afp URL"
+  },
+  {
+   "a": 555,
+   "b": 895,
+   "cos": 0.03195358791348857,
+   "ta": "giant puppy-sized spider found in south america said to be world's largest URL URL",
+   "tb": "photos of alleged robbery involving michael brown in #ferguson (via police) URL URL"
+  },
+  {
+   "a": 77,
+   "b": 1484,
+   "cos": 0.006631452731543007,
+   "ta": "no, vladimir putin did not travel in a phallic motorcade formation URL URL",
+   "tb": "marlboro ad man eric lawson dies of chronic lung disease URL @guardianworld"
+  },
+  {
+   "a": 819,
+   "b": 1435,
+   "cos": 0.04036031418633705,
+   "ta": "reports of an active gunman at san diego navy medical centre URL",
+   "tb": "update: police confirm former baseball star jose canseco shot himself in his left hand in an accidental shooting - cnn"
+  },
+  {
+   "a": 184,
+   "b": 501,
+   "cos": 0.03704976209309159,
+   "ta": "'nine britons, 23 us citizens and 80 children' feared dead after #mh17 jet 'shot down' URL URL",
+   "tb": "celebrities, friends and co-stars react to paul walker's tragic death. #rippaulwalker URL URL"
+  },
+  {
+   "a": 787,
+   "b": 915,
+   "cos": 0.01874018406499585,
+   "ta": "we've only got one planet. watch @potus share the progress we've made to protect it. #actonclimate URL",
+   "tb": "\"a black man who runs from police merely might be trying to avoid the recurring indignity of being profiled\" URL"
+  },
+  {
+   "a": 476,
+   "b": 707,
+   "cos": 0.01575741638698499,
+   "ta": "uk #krispykreme apologizes for 'kkk wednesday' customer promo. URL URL",
+   "tb": "that powerful lego letter to parents about gender and creativity? it's real. URL URL"
+  },
+  {
+   "a": 1316,
+   "b": 1482,
+   "cos": 0.029056097742114075,
+   "ta": "meet kevin vickers, the hero who shot down the parliament hill gunman #ottawashooting URL URL",
+   "tb": "pentagon confirms ahmed abdi godane, a leader of the al shabaab islamist group, was killed in a u.s. airstrike: URL"
+  },
+  {
+   "a": 273,
+   "b": 1325,
+   "cos": 0.00356971736549391,
+   "ta": "our quote of the day is from american writer dorothy parker URL",
+   "tb": "video : clueless hillary clinton calls for americans to respect and empathize with isis URL"
+  },
+  {
+   "a": 888,
+   "b": 1369,
+   "cos": 0.021179399397111543,
+   "ta": "new info on the crash that killed paul walker URL #rippaulwalker",
+   "tb": "a video has been released by isis apparently showing the murder of british hostage david haines: URL"
+  },
+  {
+   "a": 202,
+   "b": 1477,
+   "cos": 0.04887916991316743,
+   "ta": "amid the chaos of winning gold, @neymarjr found a moment with his son. URL",
+   "tb": "r.i.p roger rodas the man who died with paul walker that everybody forgot about.. #rippaulwalker #riprogerrodas URL"
+  },
+  {
+   "a": 892,
+   "b": 963,
+   "cos": 0.005587539963142764,
+   "ta": "report: nasty ios 8 bug could erase your icloud drive documents URL",
+   "tb": "okla beheading victim colleen hufford, rest in peace #beheading #jihad #jahkeemyisrael URL URL"
+  },
+  {
+   "a": 342,
+   "b": 565,
+   "cos": 0.04164795948363384,
+   "ta": "the other day i asked a manager at the #ferguson market if police had requested surveillance video. she said no.",
+   "tb": "paul walker died at the age of 40 saturday. our hearts go out to his family and friends: URL"
+  },
+  {
+   "a": 8,
+   "b": 590,
+   "cos": 0.025405172500385473,
+   "ta": "the day #ferguson cops told a dirty, bloody lie (via @thedailybeast): URL URL",
+   "tb": "here's the letter alan rickman wrote for us back in 2011, upon completing harry potter & the deathly hallows: URL"
+  },
+  {
+   "a": 241,
+   "b": 809,
+   "cos": 0.057965580737841256,
+   "ta": "this photo was taken by a tourist at the national war memorial, shortly before nathan cirillo was shot and killed. URL",
+   "tb": "this is the driver that died in the accident with paul walker. don't forget about him just because he's not famous. URL"
+  },
+  {
+   "a": 362,
+   "b": 802,
+   "cos": 0.005666112505430572,
+   "ta": "afghan woman 'kills 25 taliban' militants after son shot dead URL URL",
+   "tb": "update: uk prime minister david #cameron describes apparent beheading of david #haines as 'an act of pure evil' URL"
+  },
+  {
+   "a": 1434,
+   "b": 1466,
+   "cos": 0.05736808117920405,
+   "ta": "fast & furious 7 might still come out even after paul walker's death URL",
+   "tb": "update: attacker shot dead in parliament after soldier shot at war memorial URL #ottawashooting URL"
+  },
+  {
+   "a": 1187,
+   "b": 1225,
+   "cos": 0.0,
+   "ta": "banksy has not been arrested: internet falls for hoax report: URL URL",
+   "tb": "i aint know obama daughter was pregnant 😩"
+  },
+  {
+   "a": 1015,
+   "b": 1047,
+   "cos": 0.006057634823834374,
+   "ta": "breaking: at least 2 killed in #paris hostage situation via @afp URL",
+   "tb": "i feel some type of way. URL"
+  },
+  {
+   "a": 914,
+   "b": 1036,
+   "cos": 0.042073178849044254,
+   "ta": "soldier shot at national war memorial in ottawa URL URL",
+   "tb": "iphone 6 users report that their phones are bending in their pockets... lol. URL URL"
+  },
+  {
+   "a": 547,
+   "b": 1228,
+   "cos": 0.049614053311998786,
+   "ta": "j.k. rowling is working on an 8th harry potter book.",
+   "tb": "just in: donald trump to @msnbc: \"there has to be some form of punishment\" for women who have an abortion."
+  },
+  {
+   "a": 47,
+   "b": 115,
+   "cos": 0.026722218748591667,
+   "ta": "ex-president of el salvador, francisco flores, dies at 56, government says. URL URL",
+   "tb": "cpl. nathan cirillo pictured on the left, minutes before he was shot at the war memorial today. #cbcott #ottnews URL"
+  },
+  {
+   "a": 609,
+   "b": 1197,
+   "cos": 0.017140692525667273,
+   "ta": "watch: paul walker's last trailer for the film hours. the movie is set to release in two weeks. URL",
+   "tb": "caitlyn jenner will pose nude on the sports illustrated cover. her balls will be censored by a sad michael jordan face."
+  },
+  {
+   "a": 491,
+   "b": 502,
+   "cos": 0.00886987881019448,
+   "ta": "niagara falls turned purple on the day prince died: URL URL",
+   "tb": "paul walker's last pic before his death in car accident :'( #rip #paulwalker URL"
+  },
+  {
+   "a": 138,
+   "b": 952,
+   "cos": 0.0,
+   "ta": "prayers to our friend, tyrese. his emotional message about paul walker got us choked up... URL",
+   "tb": "witness tells #cbcnews suspected shooter of uniformed soldier at #ottawa's war memorial was carrying rifle."
+  },
+  {
+   "a": 137,
+   "b": 550,
+   "cos": 0.023459117770473915,
+   "ta": "developing news: soldier shot at war memorial. watch cbc nn for coverage. or follow online: URL URL",
+   "tb": "obama declares stay-at-home moms aren't worth a hill of beans; says it's a choice 'we don't want americans to... URL"
+  },
+  {
+   "a": 290,
+   "b": 1003,
+   "cos": 0.006153306094796142,
+   "ta": "iphone 6 plus users are sitting on and bending their enormous new phones URL",
+   "tb": "'powerful' wife & son of #isis leader abu bakr al-baghdadi have been arrested, sources to @cnn URL URL"
+  },
+  {
+   "a": 583,
+   "b": 599,
+   "cos": 0.007629827587300465,
+   "ta": "it’s a dog’s afterlife: pope francis says there’s a place for pets in paradise URL",
+   "tb": "breaking: malaysia airlines plane 'shot down' was carrying 295 people URL URL"
+  },
+  {
+   "a": 387,
+   "b": 462,
+   "cos": 0.004136274643906741,
+   "ta": "hero: kevin vickers moments after shooting dead canadian parliament attacker - URL / URL",
+   "tb": "*reads things about talking angela* \"talking angela gets ur personal info\" \"talking angela can access all ur photos\" URL"
+  },
+  {
+   "a": 754,
+   "b": 1251,
+   "cos": 0.12529090849724905,
+   "ta": "confirmed: #mikebrown had no criminal record. URL #ferguson URL",
+   "tb": "did anyone think of comparing the clothes that #mikebrown was wearing when he was laying on the street to the security footage? #ferguson"
+  },
+  {
+   "a": 47,
+   "b": 645,
+   "cos": 0.08852371352495779,
+   "ta": "ex-president of el salvador, francisco flores, dies at 56, government says. URL URL",
+   "tb": "dear president obama...it looks like stay-at-home moms vote too."
+  },
+  {
+   "a": 821,
+   "b": 1369,
+   "cos": 0.0035751624667809006,
+   "ta": "at least 45 killed in triple bombing near damascus URL",
+   "tb": "a video has been released by isis apparently showing the murder of british hostage david haines: URL"
+  },
+  {
+   "a": 892,
+   "b": 1296,
+   "cos": 0.0026963780168870366,
+   "ta": "report: nasty ios 8 bug could erase your icloud drive documents URL",
+   "tb": "great @banksy homage to charlie hebdo victims: rt @kowalshki: nice work from banksy #jesuischarlie URL"
+  },
+  {
+   "a": 1216,
+   "b": 1416,
+   "cos": 0.0,
+   "ta": "hey @abc, why won't you tweet a statement saying that you did not pay or compensate darren wilson for the interview? why silent? #ferguson",
+   "tb": "rt @xxl: president obama’s daughter wears a pro era t-shirt: URL URL"
+  }
+ ],
+ "recall_pool": [
+  {
+   "a": 49,
+   "b": 698,
+   "cos": 0.24260197008792111,
+   "ta": "paul walker mourned by vin diesel and more 'fast & furious' co-stars URL #rippaulwalker URL",
+   "tb": "remembering paul walker: fast and furious star was \"so happy\" hours before his tragic death URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 516,
+   "b": 747,
+   "cos": 0.428292420452686,
+   "ta": "francis teaches you how to make your own doritos flavored mountain dew! watch: URL then share! :) URL",
+   "tb": "doritos-flavored mountain dew is a real thing URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 62,
+   "b": 77,
+   "cos": 0.40540483148554546,
+   "ta": "vladimir putin’s motorcade as seen from the air. URL URL",
+   "tb": "no, vladimir putin did not travel in a phallic motorcade formation URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 914,
+   "b": 1110,
+   "cos": 0.5506658993623615,
+   "ta": "soldier shot at national war memorial in ottawa URL URL",
+   "tb": "the scene at the war memorial in ottawa URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": true,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 914,
+   "b": 1337,
+   "cos": 0.3950505324539554,
+   "ta": "soldier shot at national war memorial in ottawa URL URL",
+   "tb": "soldier killed at war memorial identified as cpl. nathan cirillo - URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 1271,
+   "b": 1444,
+   "cos": 0.35988447468410084,
+   "ta": "attack on parliament: soldier shot; gunman on the loose. follow our developing story: URL URL",
+   "tb": "cxn: 1 gunman shot dead in parliament hill attack, soldier shot in ottawa URL no report soldier dead. #ottawashooting",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 150,
+   "b": 763,
+   "cos": 0.22850118401315866,
+   "ta": "fan of \"fast & furious\" actor paul walker shocked by his death as memorial grows URL URL",
+   "tb": "hard to believe paul walker died yesterday. no more fast & furious. way too young. #rip URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 1171,
+   "b": 1433,
+   "cos": 0.22923197271860152,
+   "ta": "latest update: attacker shot dead in parliament after soldier shot at national war memorial URL URL",
+   "tb": "dogs of canadian reservist killed at national war memorial wait for him to return home URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 820,
+   "b": 919,
+   "cos": 0.2021150859842077,
+   "ta": "rip roger rodas, the man who died with paul walker. #rippaulwalker #riprogerrodas URL",
+   "tb": "paul walker's friends and castmates poured out their hearts overnight URL #rippaulwalker",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 650,
+   "b": 953,
+   "cos": 0.33796737810968225,
+   "ta": "a canadian soldier has been shot at the country's national war memorial near parliament. URL URL",
+   "tb": "parliament hill in lockdown after soldier shot at #ottawa's war memorial, just south of east block.",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 165,
+   "b": 254,
+   "cos": 0.20395771754961775,
+   "ta": "police say they have located car belonging to suspect in #ottawa shooting. uniformed soldier shot at war memorial, condition unknown.",
+   "tb": "canadian soldier who was shot at #ottawa's war memorial is a reservist serving with the argyll and sutherland highlanders in #hamilton, ont.",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 275,
+   "b": 534,
+   "cos": 0.4001968029703181,
+   "ta": "lego letter from the 1970s still offers a powerful message to parents 40 years later URL URL",
+   "tb": "another letter to parents, included in 1970s lego sets URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 420,
+   "b": 607,
+   "cos": 0.2141073444925226,
+   "ta": "r.i.p to the driver who died with paul walker that no one cares about because he wasn’t famous",
+   "tb": "still cah believe paul walker died r.i.p paul walker r.i.p brian o'connor r.i.p fast & furious URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 269,
+   "b": 876,
+   "cos": 0.4326896090998853,
+   "ta": "people are over here boycotting @target over their new transgender bathroom policy and i'm just like URL",
+   "tb": "american family association gets 500,000 to sign petition boycotting target over its transgender bathroom policy URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 646,
+   "b": 1400,
+   "cos": 0.2944734655712026,
+   "ta": "shots were fired at canada's national war memorial in ottawa and a ceremonial guard was shot, police say. URL",
+   "tb": "this photo was taken by a tourist at the national war memorial, shortly before nathan cirillo was shot and killed. URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 404,
+   "b": 1101,
+   "cos": 0.4059690355878737,
+   "ta": "malaysia airlines plane mh17 'shot down in ukraine near russian border' URL URL",
+   "tb": "first photo from the malaysia airlines crash site in ukraine. via @reuters URL #mh17 URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 456,
+   "b": 1344,
+   "cos": 0.4526420662178188,
+   "ta": "a world without chocolate?! two of the world's biggest chocolate makers could face a shortage: URL URL",
+   "tb": "we are running out of chocolate, warns world's largest chocolate manufacturer URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 235,
+   "b": 599,
+   "cos": 0.20702585672097412,
+   "ta": "who shot down the plane? where are the black boxes? 8 unanswered questions from #mh17: URL URL",
+   "tb": "breaking: malaysia airlines plane 'shot down' was carrying 295 people URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 341,
+   "b": 1418,
+   "cos": 0.21159372447668878,
+   "ta": "fbi probing alleged audio of michael brown shooting URL URL",
+   "tb": "fbi assisting in the case of the ottawa shooting, sources have confirmed to ctv news",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 111,
+   "b": 673,
+   "cos": 0.20521012269138303,
+   "ta": "d.a. to seek death in #moore, #oklahoma beheading case. #altonnolen #kellyfile URL",
+   "tb": "oklahoma beheading suspect alton nolen ordered held without bond URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 323,
+   "b": 1477,
+   "cos": 0.2961245336118484,
+   "ta": "r.i.p to the driver that died with paul walker that no one cares about because he wasn't famous.",
+   "tb": "r.i.p roger rodas the man who died with paul walker that everybody forgot about.. #rippaulwalker #riprogerrodas URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 551,
+   "b": 919,
+   "cos": 0.23045304116492568,
+   "ta": "we send our deepest condolences to the family and friends of paul walker and roger rodas. URL URL",
+   "tb": "paul walker's friends and castmates poured out their hearts overnight URL #rippaulwalker",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 512,
+   "b": 953,
+   "cos": 0.35597000507426546,
+   "ta": "the canadian soldier shot at the war memorial in ottawa has died, according to two members of parliament. live blog: URL",
+   "tb": "parliament hill in lockdown after soldier shot at #ottawa's war memorial, just south of east block.",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 855,
+   "b": 1254,
+   "cos": 0.2201763947372707,
+   "ta": "this young woman was shot with a nerf bullet by a #ferguson police officer, she lost her eye. URL",
+   "tb": "urgent: darren wilson is the police officer who shot mike brown URL #ferguson URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 159,
+   "b": 1369,
+   "cos": 0.47444891907281583,
+   "ta": "david haines 'beheading': isis release video claiming to show execution of british hostage URL URL",
+   "tb": "a video has been released by isis apparently showing the murder of british hostage david haines: URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 791,
+   "b": 1110,
+   "cos": 0.21605335083159583,
+   "ta": "update: one shooter possibly on the loose in #ottawa amid reports of shootings in the city: URL",
+   "tb": "the scene at the war memorial in ottawa URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 555,
+   "b": 927,
+   "cos": 0.2902074798619466,
+   "ta": "giant puppy-sized spider found in south america said to be world's largest URL URL",
+   "tb": "meet the south american goliath birdeater -- a spider the size of a puppy: URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 189,
+   "b": 612,
+   "cos": 0.7458385250814025,
+   "ta": "marlboro man dies of smoking-related disease URL URL",
+   "tb": "ex-marlboro man dies from smoking -related disease URL via @fox411",
+   "co": {
+    "0.7": true,
+    "0.6": true,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 351,
+   "b": 1143,
+   "cos": 0.23983525697841407,
+   "ta": "walmart donates $10,000 to support darren wilson, but won't give tracy morgan a penny for the accident their company caused. #boycottwalmart",
+   "tb": "#walmart donates $10,000 to #darrenwilson fund to continue police racial profiling, brutality, murder of black ppl URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 436,
+   "b": 872,
+   "cos": 0.277159869068838,
+   "ta": "police in #ottawa cannot confirm whether gunman shot dead in parliament is the same person that shot and killed soldier at the war memorial,",
+   "tb": "cpl. nathan cirillo, 24, identified as the soldier who was shot, killed at the war memorial today. #cbcott #ottnews URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 330,
+   "b": 714,
+   "cos": 0.30994699108070894,
+   "ta": "islamic state releases audio it says is of leader abu bakr al-baghdadi days after reports he was killed or injured URL",
+   "tb": "the head of isis, abu bakr al-baghdadi, is said to have been critically wounded in a us air strike: URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 320,
+   "b": 1389,
+   "cos": 0.5555661463799575,
+   "ta": "sugarhill gang rapper big bank hank has died at the age of 57. read about his legacy and contribution to hip hop: URL",
+   "tb": "sugarhill gang's big bank hank dies at 57 URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": true,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 510,
+   "b": 1250,
+   "cos": 0.2959213441256063,
+   "ta": "scene at ottawa war memorial. soldier on duty shot. URL",
+   "tb": "more: canadian soldier shot at war memorial has died; one of three suspected gunmen also dead, police say: URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 621,
+   "b": 721,
+   "cos": 0.202105087849421,
+   "ta": "#charliehebdo shooting: gunmen shouted 'we have avenged the prophet\" during attack - reports URL URL",
+   "tb": "french police chief killed himself after #charliehebdo attack URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 691,
+   "b": 1212,
+   "cos": 0.2452883351594895,
+   "ta": "340,000 pledge to boycott @target over transgender bathroom policy URL URL",
+   "tb": "twenty-five stories proving target’s pro-trans bathroom policy is dangerous URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 1243,
+   "b": 1374,
+   "cos": 0.2639387205736647,
+   "ta": "photos proved that terrorists used chemical weapons against the kurds #kobanî #airdrop2kobane #kurdistan #isis URL",
+   "tb": "now kurds are being killed by the chemical weapons of isis what more excuses do you have to not help us? #kobane URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 501,
+   "b": 1361,
+   "cos": 0.42676345218677725,
+   "ta": "celebrities, friends and co-stars react to paul walker's tragic death. #rippaulwalker URL URL",
+   "tb": "harry potter stars react to the tragic news of alan rickman's death: URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 452,
+   "b": 876,
+   "cos": 0.2126512971138626,
+   "ta": "target’s new transgender policy raises all sorts of questions. URL",
+   "tb": "american family association gets 500,000 to sign petition boycotting target over its transgender bathroom policy URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 668,
+   "b": 1101,
+   "cos": 0.21411145267988857,
+   "ta": "tyrese at the crash site, where paul walker died, i proper feel for him URL",
+   "tb": "first photo from the malaysia airlines crash site in ukraine. via @reuters URL #mh17 URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 479,
+   "b": 695,
+   "cos": 0.6239062285986244,
+   "ta": "report: caitlyn jenner will pose nude for sports illustrated URL URL",
+   "tb": "caitlyn jenner will pose nude on the sports illustrated cover. her balls will be censored by a sad michael jordan face.",
+   "co": {
+    "0.7": false,
+    "0.6": true,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 422,
+   "b": 833,
+   "cos": 0.2812449907790481,
+   "ta": "scientist discover a puppy-sized spider in the rainforest, better known as the 'nope' spider URL URL",
+   "tb": "meet the south american goliath birdeater -- a spider the size of a puppy: URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 419,
+   "b": 953,
+   "cos": 0.2037851251028846,
+   "ta": "ottawa shooting: how events unfolded, first shots fired at 9:52 a.m. at the war memorial URL URL",
+   "tb": "parliament hill in lockdown after soldier shot at #ottawa's war memorial, just south of east block.",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 311,
+   "b": 588,
+   "cos": 0.2835038931637072,
+   "ta": "ukraine officials say malaysia plane #mh17 was shot down by a buk missile system URL URL",
+   "tb": "the fact that malaysia airlines #mh17 was shot down may hinder insurance payouts URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 32,
+   "b": 607,
+   "cos": 0.5524191671796526,
+   "ta": "paul walker died too fast, i'm furious.. :/",
+   "tb": "still cah believe paul walker died r.i.p paul walker r.i.p brian o'connor r.i.p fast & furious URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 293,
+   "b": 1190,
+   "cos": 0.306281088733423,
+   "ta": "#isis used chemical weapons in #kobani . against civilian #kurds• #retweeet to #savekobani _ #twitterkurds #kobane URL",
+   "tb": "#live from #kobane border: growing concern that #isis has been using chemical weapons against #kurdish fighters. URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 607,
+   "b": 629,
+   "cos": 0.24806515693160902,
+   "ta": "still cah believe paul walker died r.i.p paul walker r.i.p brian o'connor r.i.p fast & furious URL",
+   "tb": "his movies brought thrills and laughter to millions. can't believe he died in car crash rip paul walker URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 515,
+   "b": 1000,
+   "cos": 0.31559589448470365,
+   "ta": "r.i.p to the driver who died with paul walker that no one cares about because he wasn’t famous.",
+   "tb": "r.i.p roger rodas the man who died with paul walker that everybody forgot about.. #rippaulwalker #riprogerrodas URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 735,
+   "b": 956,
+   "cos": 0.214053094094353,
+   "ta": "it's official, @berniesanders actually won nevada today. came down to 2 factors. 1. enthusiasm 2. organization URL",
+   "tb": "nevada focus group of #pbsdebate says @berniesanders won tonight's debate by a 25 to 9 margin.",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 1257,
+   "b": 1436,
+   "cos": 0.3829078415366084,
+   "ta": "cool dog! mt @cbsnews: goliath encounter: puppy-sized spider surprises scientist in rainforest URL URL",
+   "tb": "spiders ↑ scientist finds puppy-sized spider in rainforest. sit. stay. forever. URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 646,
+   "b": 914,
+   "cos": 0.48364525346129406,
+   "ta": "shots were fired at canada's national war memorial in ottawa and a ceremonial guard was shot, police say. URL",
+   "tb": "soldier shot at national war memorial in ottawa URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 301,
+   "b": 994,
+   "cos": 0.2967902532888235,
+   "ta": "breaking: soldier shot at war memorial in ottawa, hill on lockdown, shooter at large URL #ottnews",
+   "tb": "conservative caucas informed soldier shot at war memorial in ottawa this morning has died. a sad development on a shocking day.",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 317,
+   "b": 444,
+   "cos": 0.2805924863153298,
+   "ta": "microsoft is reportedly buying 'minecraft' developer mojang for $2 billion URL",
+   "tb": "huh. the wall street journal reports microsoft is close to a $2b deal with mojang, aka the creators of minecraft. URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 73,
+   "b": 1331,
+   "cos": 0.2054570624781797,
+   "ta": "breaking news: isis beheads a british hostage david haines in message to america's partners. URL",
+   "tb": "just in: isis video claims to show beheading of british citizen URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 513,
+   "b": 1373,
+   "cos": 0.2701640932334583,
+   "ta": "could a buk surface-to-air missile system have brought down malaysia airlines flight 17? URL #mh17 URL",
+   "tb": "reported photographs from malaysia airlines #mh17 crash: URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 343,
+   "b": 833,
+   "cos": 0.2294939351306595,
+   "ta": "scientist releases this horrifying picture of a puppy-sized spider he found in the rainforest URL URL",
+   "tb": "meet the south american goliath birdeater -- a spider the size of a puppy: URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 117,
+   "b": 798,
+   "cos": 0.3694892909336076,
+   "ta": "banksy's response to the #charliehebdo attack isn't by banksy. but it is striking: URL URL",
+   "tb": "powerful image, yes. but it was drawn by @lucilleclerc, not by banksy. details: URL #charliehebdo URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 203,
+   "b": 1422,
+   "cos": 0.43140990033209403,
+   "ta": "chick-fil-a manager reportedly bans list of unprofessional words, internet erupts: URL URL",
+   "tb": "the manager at a chick-fil-a made a list of words his employees are no longer allowed to say. URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 493,
+   "b": 839,
+   "cos": 0.4169007157260664,
+   "ta": "breaking news: ottawa police confirm at least 3 separate shooting sites and multiple suspects - URL",
+   "tb": "breaking news: ottawa police confirm to abc news they are looking for 3 suspects, one has been 'dealt with' - URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 277,
+   "b": 667,
+   "cos": 0.30100782662491465,
+   "ta": "considering the #orlando shooter was a registered democrat i'd like to just put these back here: URL",
+   "tb": "nyc pride parade after orlando: “republican hate kills\" no. the orlando shooter was a muslim democrat. URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 710,
+   "b": 831,
+   "cos": 0.35497964583830965,
+   "ta": "donna douglas, known for role as elly may clampett on \"the beverly hillbillies,\" dies. URL URL",
+   "tb": "family says 'beverly hillbillies' actress donna douglas is dead at age 81 - @nbc12 URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 762,
+   "b": 1187,
+   "cos": 0.34589382596437435,
+   "ta": "that old \"banksy arrested\" hoax is back. don't buy into it. URL",
+   "tb": "banksy has not been arrested: internet falls for hoax report: URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 1166,
+   "b": 1483,
+   "cos": 0.23710906464260062,
+   "ta": "happy #lefthandersday URL",
+   "tb": "happy 74th birthday, stephen hawking! URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 674,
+   "b": 954,
+   "cos": 0.2079305018894292,
+   "ta": "fukushima – toxic water leak a level 3 serious incident URL fuck you tepco! fucking ocean is boiling!!! #yan",
+   "tb": "water leaks at fukushima could contaminate entire pacific ocean URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 269,
+   "b": 452,
+   "cos": 0.29369823792248084,
+   "ta": "people are over here boycotting @target over their new transgender bathroom policy and i'm just like URL",
+   "tb": "target’s new transgender policy raises all sorts of questions. URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 271,
+   "b": 1400,
+   "cos": 0.25180137770666816,
+   "ta": "1 shot at war memorial in canada's capital. URL",
+   "tb": "this photo was taken by a tourist at the national war memorial, shortly before nathan cirillo was shot and killed. URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 926,
+   "b": 1050,
+   "cos": 0.398426140616491,
+   "ta": "gonna be unreal when las vegas goes undefeated at home every year........ #nhl #expansion",
+   "tb": "nhl expansion to las vegas is reportedly 'a done deal.' URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 864,
+   "b": 1316,
+   "cos": 0.2458133223844035,
+   "ta": "the canadian soldier shot at the war memorial has died, officials reported. URL #ottawashooting URL",
+   "tb": "meet kevin vickers, the hero who shot down the parliament hill gunman #ottawashooting URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 336,
+   "b": 534,
+   "cos": 0.4001968029703181,
+   "ta": "lego letter from the 1970s still offers a powerful message to parents 40 years later URL URL",
+   "tb": "another letter to parents, included in 1970s lego sets URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 108,
+   "b": 1470,
+   "cos": 0.22567518889068836,
+   "ta": "breaking news: iraqi state tv confirms isis group leader al-baghdadi wounded in airstrike - URL URL",
+   "tb": "reports that is leader abu bakr al-baghdadi was wounded in a coalition air strike are \"unconfirmed\" - us defense sec john kirby #r4today",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 79,
+   "b": 1167,
+   "cos": 0.29862628041905903,
+   "ta": "#hongkong’s protesters are using the “hands up, don’t shoot” gesture from #ferguson URL URL",
+   "tb": "rt @dangillmor hong kong \"hands up, don't shoot\" emulation of ferguson protests is such a powerful image: URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 871,
+   "b": 973,
+   "cos": 0.29124067695497063,
+   "ta": "really? amber alert website goes dark under government shutdown URL",
+   "tb": "obama has taken down amber alert website during shutdown, but michelle's let's move site is still up. at least missing kids won't be thirsty",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 1350,
+   "b": 1449,
+   "cos": 0.21626166741559932,
+   "ta": "irritated chick-fil-a manager makes a list of teen slang his employees are forbidden to use URL URL",
+   "tb": "a chick-fil-a manager allegedly banned the words “bae,” “fleek,” and “ratchet” at work URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 346,
+   "b": 776,
+   "cos": 0.2815891404193663,
+   "ta": "mass grave found in mexico near area where 43 students vanished after a confrontation with police: URL - @thisisfusion",
+   "tb": "#viral: mexico mass grave discovered after student protesters go missing URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 743,
+   "b": 819,
+   "cos": 0.3268969907827394,
+   "ta": "no evidence found of gunfire at naval medical center san diego, but building search continues, military says. URL",
+   "tb": "reports of an active gunman at san diego navy medical centre URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 981,
+   "b": 997,
+   "cos": 0.2503059221919069,
+   "ta": "“r.i.p to the driver who died with paul walker that no one cares about because he wasn’t famous” omg:(",
+   "tb": "r.i.p to roger rodas who died alongside paul walker URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 1042,
+   "b": 1207,
+   "cos": 0.544762083437768,
+   "ta": "more: tesla motors picks nevada as home of new electric car battery factory, beating 4 other states: URL",
+   "tb": "breaking: ap source: tesla motors has selected nevada as site for $5b electric car battery factory.",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 420,
+   "b": 1048,
+   "cos": 0.9999999999999999,
+   "ta": "r.i.p to the driver who died with paul walker that no one cares about because he wasn’t famous",
+   "tb": "r.i.p to the driver who died with paul walker that no one cares about because he wasn't famous.",
+   "co": {
+    "0.7": true,
+    "0.6": true,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 621,
+   "b": 1285,
+   "cos": 0.21897437645142478,
+   "ta": "#charliehebdo shooting: gunmen shouted 'we have avenged the prophet\" during attack - reports URL URL",
+   "tb": "two gunmen killed in pakistan university attack, police say, with reports others still firing URL",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": false,
+    "0.2": true
+   }
+  },
+  {
+   "a": 510,
+   "b": 1110,
+   "cos": 0.661215712929891,
+   "ta": "scene at ottawa war memorial. soldier on duty shot. URL",
+   "tb": "the scene at the war memorial in ottawa URL URL",
+   "co": {
+    "0.7": false,
+    "0.6": true,
+    "0.5": true,
+    "0.4": true,
+    "0.3": true,
+    "0.2": true
+   }
+  },
+  {
+   "a": 131,
+   "b": 515,
+   "cos": 0.2928860742003866,
+   "ta": "r.i.p paul walker.... he died doing what he loved... and that's going fast. URL",
+   "tb": "r.i.p to the driver who died with paul walker that no one cares about because he wasn’t famous.",
+   "co": {
+    "0.7": false,
+    "0.6": false,
+    "0.5": false,
+    "0.4": false,
+    "0.3": true,
+    "0.2": true
+   }
+  }
+ ],
+ "n_recall_pool": 4556
+}
