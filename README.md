@@ -155,6 +155,22 @@ python scripts/run_deberta_baselines.py --out-dir out  # neural baselines (GPU, 
 
 Each run writes per-split metrics, 95% confidence intervals, paired significance tests and the exact test tweet IDs to `results/`, so every number above can be reproduced and compared on identical splits.
 
+## Web app (backend + frontend)
+
+A FastAPI service serves GE-Stack and a small static frontend (no build step).
+
+```bash
+pip install -r requirements-backend.txt      # light: no torch needed
+uvicorn backend.app:app --reload             # http://localhost:8000  (API docs at /docs)
+python -m pytest tests                       # API tests
+```
+
+The first request trains the models on the full dataset (~1-2 min on CPU) and caches them in `backend/artifacts/`.
+
+- `POST /api/predict` takes `{dataset, text, propagation?: [{user, delay_minutes}]}` (or `{dataset, sample_id}`). With a propagation list it uses all three views; without one it uses a text-only stack, since the analysis above shows a stack that trusts an empty spreader view does worse.
+- `GET /api/samples` returns dataset tweets to try; `GET /api/health` lists datasets and classes.
+- Models are trained on 4-class Twitter15/16, so outputs are rumour categories, not verified fact-checks. Dataset samples were in the training data, so their scores are optimistic.
+
 ## Repository layout
 
 ```

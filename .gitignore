@@ -5,3 +5,4 @@ results/
 .ipynb_checkpoints/
 .venv/
 *.egg-info/
+backend/artifacts/

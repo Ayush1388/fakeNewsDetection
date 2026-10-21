@@ -92,6 +92,15 @@ def read_propagation_views(tree_path: str | Path):
             except ValueError:
                 pass
 
+    return propagation_views_from_nodes(users, delays)
+
+
+def propagation_views_from_nodes(users, delays):
+    """
+    Build (spreaders, cascade) from the user ids and delays (minutes)
+    of every retweet / reply node in a cascade.
+    """
+
     d = np.clip(np.asarray(delays or [0.0], dtype=np.float64), 0.0, None)
 
     cascade = np.array(

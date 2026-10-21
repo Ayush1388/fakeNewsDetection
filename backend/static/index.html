@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rumour Detector</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Rumour Detector</h1>
+    <p>GE-Stack classifies a tweet as <b>non-rumour / true / false / unverified</b> from its text and, optionally, how it spread.</p>
+  </header>
+
+  <section class="card">
+    <div class="row">
+      <label>Dataset
+        <select id="dataset"><option>twitter15</option><option>twitter16</option></select>
+      </label>
+    </div>
+    <label>Tweet text
+      <textarea id="text" rows="3" maxlength="2000" placeholder="Paste a tweet…"></textarea>
+    </label>
+    <label>Propagation <span class="hint">(optional, one retweeter per line: <code>user_id, delay_minutes</code>)</span>
+      <textarea id="prop" rows="4" placeholder="39364684, 0&#10;21061006, 0.45&#10;18513522, 0.85"></textarea>
+    </label>
+    <div class="row">
+      <button id="go">Analyse</button>
+      <button id="clear" class="ghost">Clear</button>
+    </div>
+    <p id="error" class="error" role="alert" hidden></p>
+  </section>
+
+  <section id="result" class="card" hidden>
+    <div class="verdict"><span id="label"></span><span id="conf"></span></div>
+    <p id="note" class="hint"></p>
+    <h3>Class probabilities</h3>
+    <div id="bars"></div>
+    <h3>Per-view probabilities</h3>
+    <div id="views"></div>
+  </section>
+
+  <section class="card">
+    <div class="row between">
+      <h3>Try a dataset example</h3>
+      <button id="reload" class="ghost">Shuffle</button>
+    </div>
+    <p class="hint">Examples were in the training data, so their scores are optimistic.</p>
+    <ul id="samples"></ul>
+  </section>
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>
