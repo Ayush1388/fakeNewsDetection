@@ -181,3 +181,120 @@ document.querySelectorAll(".navbtn").forEach((b) => b.onclick = () => {
 $("shuffle").onclick = loadSamples;
 $("ex-dataset").onchange = loadSamples;
 show("intake");
+
+/* ---------- model results ---------- */
+const CLASS_LABEL = { "non-rumor": "Not a rumour", true: "Verified", false: "False", unverified: "Unverified" };
+const PROTO_TITLE = { random: "Random split", "story0.5": "Unseen stories", "story0.3": "Unseen stories, strict", temporal: "Past to future" };
+const f1 = (n) => n.toFixed(1);
+const SHORT = { "non-rumor": "Not rumour", true: "Verified", false: "False", unverified: "Unverified" };
+const PROTO_ORDER = ["random", "story0.5", "story0.3", "temporal"];
+
+function table(headers, rows) {
+  const wrap = el("div", "tablewrap"); const t = el("table", "t");
+  const thead = el("thead"); const hr = el("tr");
+  headers.forEach((h) => hr.append(el("th", "", h))); thead.append(hr); t.append(thead);
+  const tb = el("tbody");
+  rows.forEach((r) => { const tr = el("tr"); r.forEach((cell) => tr.append(cell)); tb.append(tr); });
+  t.append(tb); wrap.append(t); return wrap;
+}
+function statCell(s, best, bar) {
+  const td = el("td", best ? "best" : "");
+  td.append(document.createTextNode(f1(s.mean)));
+  if (s.sd != null) td.append(el("span", "sd", " ±" + f1(s.sd)));
+  if (bar) { const b = el("span", "accbar"); const i = el("i"); i.style.width = s.mean + "%"; b.append(i); td.append(b); }
+  return td;
+}
+function block(title, sub) {
+  const b = el("div", "res-block"); b.append(el("h3", "", title)); if (sub) b.append(el("p", "sub", sub)); return b;
+}
+
+function renderResults(R, key) {
+  const body = $("res-body"); body.textContent = "";
+  const ds = R.datasets[key];
+
+  const m = block("What we are using: " + R.model.name, R.model.summary);
+  const card = el("div", "mcard");
+  R.model.views.forEach((v) => { const d = el("div"); d.append(el("b", "", v.name), el("span", "", v.detail)); card.append(d); });
+  m.append(card, el("p", "meta-line", `Final step: ${R.model.meta}. Trains on ${R.model.trains_on}.`));
+  body.append(m);
+
+  const a = block("Accuracy by test protocol", "Average over 10 runs with different seeds, ± one standard deviation. Harder protocols test tweets about stories the model has not seen.");
+  const rows = ds.protocols.map((p) => {
+    const first = el("td"); first.textContent = p.title;
+    const best = Math.max(p.views.text.mean, p.views.spreaders.mean, p.views.cascade.mean);
+    return [first, statCell(p.accuracy, true, true), statCell(p.macro_f1, false, false),
+      statCell(p.views.text, p.views.text.mean === best, false), statCell(p.views.spreaders, p.views.spreaders.mean === best, false),
+      statCell(p.views.cascade, p.views.cascade.mean === best, false)];
+  });
+  a.append(table(["Protocol", "GE-Stack acc.", "Macro F1", "Text only", "Spreaders only", "Cascade only"], rows));
+  body.append(a);
+
+  const w = block("What happens when a view is removed", "Accuracy of the stack trained without one view. A bigger drop means that view matters more.");
+  w.append(table(["Protocol", "All views", "No text", "No spreaders", "No cascade"], ds.protocols.map((p) => {
+    const first = el("td"); first.textContent = p.title;
+    return [first, statCell(p.accuracy, true), statCell(p.without.text), statCell(p.without.spreaders), statCell(p.without.cascade)];
+  })));
+  body.append(w);
+
+  const rnd = ds.protocols.find((p) => p.key === "random");
+  const two = el("div", "two");
+  const pc = block("Per-class F1", "Random split. Higher is better.");
+  R.classes.forEach((c) => {
+    const v = rnd.per_class_f1[c]; const row = el("div", "bar top");
+    const track = el("div", "track"); const fill = el("div", "fill"); fill.style.width = v + "%"; track.append(fill);
+    row.append(el("span", "", CLASS_LABEL[c]), track, el("span", "v", f1(v)));
+    pc.append(row);
+  });
+  const cmBlock = block("Confusion matrix", "Random split, all 10 runs added up. Rows are the true class, columns the prediction.");
+  const cm = el("div", "cm"); cm.append(el("span"));
+  R.classes.forEach((c) => cm.append(el("span", "h", SHORT[c])));
+  const maxv = Math.max(...ds.confusion_random.flat());
+  ds.confusion_random.forEach((row, i) => {
+    cm.append(el("span", "rowh", SHORT[R.classes[i]]));
+    row.forEach((v, j) => {
+      const cell = el("span", "c", String(v));
+      const a2 = (v / maxv) * (i === j ? 0.55 : 0.9);
+      cell.style.background = `color-mix(in srgb, ${i === j ? "var(--green)" : "var(--vermilion)"} ${Math.round(a2 * 100)}%, transparent)`;
+      cm.append(cell);
+    });
+  });
+  cmBlock.append(cm);
+  two.append(pc, cmBlock); body.append(two);
+
+  const cmp = R.neural_comparison.filter((r) => r.dataset === key);
+  if (cmp.length) {
+    const n = block("Against fine-tuned neural models", "Same test tweets for every model. GE-Stack is the model behind the rulings above.");
+    const byProto = {};
+    cmp.forEach((r) => { (byProto[r.protocol] = byProto[r.protocol] || { g: r.gestack, n: r.n_test, models: {} }).models[r.model] = r; });
+    const names = [...new Set(cmp.map((r) => r.model))];
+    n.append(table(["Protocol", "GE-Stack", ...names, "Gain over best"], Object.entries(byProto).sort((x, y) => PROTO_ORDER.indexOf(x[0]) - PROTO_ORDER.indexOf(y[0])).map(([proto, d]) => {
+      const first = el("td"); first.textContent = PROTO_TITLE[proto] || proto;
+      const best = Math.max(...names.map((m2) => d.models[m2].neural));
+      const gcell = el("td", "best", f1(d.g));
+      const cells = names.map((m2) => el("td", "", f1(d.models[m2].neural)));
+      return [first, gcell, ...cells, el("td", "", "+" + f1(d.g - best))];
+    })));
+    n.append(el("p", "meta-line", "Neural models overfit here: with about 1,000 short tweets they memorise the training set. Test sets have 224 tweets, so each result carries a few points of noise."));
+    body.append(n);
+  }
+
+  body.append(el("p", "meta-line", "Caution: random-split scores are optimistic, because near-duplicate tweets sit on both sides of the split. The harder protocols are a fairer guide to new stories."));
+}
+
+async function loadResults() {
+  try {
+    const R = await api("/api/results");
+    const tabs = $("res-tabs"); tabs.textContent = "";
+    const keys = Object.keys(R.datasets);
+    const select = (k) => {
+      tabs.querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.k === k)));
+      renderResults(R, k);
+    };
+    keys.forEach((k) => {
+      const b = el("button", "", R.datasets[k].label); b.type = "button"; b.role = "tab"; b.dataset.k = k;
+      b.onclick = () => select(k); tabs.append(b);
+    });
+    select(keys[0]);
+  } catch (e) { $("res-body").textContent = ""; $("res-body").append(el("p", "error", e.message)); }
+}
+loadResults();

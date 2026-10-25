@@ -17,6 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from backend import model_store as store
+from backend import results as results_data
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 MAX_NODES = 100_000
@@ -44,6 +45,15 @@ def _check_dataset(name: str):
 @app.get("/api/health")
 def health():
     return {"status": "ok", "datasets": list(store.DATASETS), "classes": store.CLASS_NAMES}
+
+
+@app.get("/api/results")
+def results():
+    """Published evaluation numbers for the model, read from docs/."""
+    try:
+        return results_data.load()
+    except FileNotFoundError:
+        raise HTTPException(404, "Result files are missing from docs/.")
 
 
 @app.get("/api/samples")

@@ -36,3 +36,10 @@ def test_sample_roundtrip():
 ])
 def test_errors(body, code):
     assert client.post("/api/predict", json=body).status_code == code
+
+
+def test_spread_summary_returned_with_propagation():
+    nodes = [{"user": f"u{i}", "delay_minutes": float(i)} for i in range(10)]
+    j = client.post("/api/predict", json={"text": "x claim", "propagation": nodes}).json()
+    assert j["spread"]["nodes"] == 10 and j["spread"]["within_5min"] == 0.6
+    assert client.post("/api/predict", json={"text": "x claim"}).json()["spread"] is None

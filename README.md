@@ -169,6 +169,8 @@ The first request trains the models on the full dataset (~1-2 min on CPU) and ca
 
 - `POST /api/predict` takes `{dataset, text, propagation?: [{user, delay_minutes}]}` (or `{dataset, sample_id}`). With a propagation list it uses all three views; without one it uses a text-only stack, since the analysis above shows a stack that trusts an empty spreader view does worse.
 - `GET /api/samples` returns dataset tweets to try; `GET /api/health` lists datasets and classes.
+- `GET /api/results` returns the published evaluation numbers (read from `docs/extended_results.json` and `docs/revision/neural_paired.json`). The page shows them at the bottom: model description, accuracy by protocol, view ablations, per-class F1, confusion matrix and the neural comparison.
+- Tests: `tests/` covers the API, result files, model store, an accuracy sanity check on held-out data, and the static frontend (20 tests, about 30 s once the models are cached).
 - Models are trained on 4-class Twitter15/16, so outputs are rumour categories, not verified fact-checks. Dataset samples were in the training data, so their scores are optimistic.
 
 ## Repository layout
