@@ -109,11 +109,28 @@ def predict(dataset: str, text: str, nodes=None) -> dict:
     label = max(probs, key=probs.get)
     return {
         "dataset": dataset,
+        "spread": _spread_summary(nodes),
         "label": label,
         "confidence": probs[label],
         "probabilities": probs,
         "views_used": list(model.use_views),
         "per_view": per_view,
+    }
+
+
+def _spread_summary(nodes):
+    """Plain-language cascade stats for the UI, or None without a cascade."""
+    if not nodes:
+        return None
+    d = np.clip(np.asarray([float(x) for _, x in nodes]), 0.0, None)
+    return {
+        "nodes": len(nodes),
+        "unique_users": len({str(u) for u, _ in nodes}),
+        "first_delay_min": float(d.min()),
+        "median_delay_min": float(np.median(d)),
+        "within_5min": float((d <= 5).mean()),
+        "within_60min": float((d <= 60).mean()),
+        "within_1day": float((d <= 1440).mean()),
     }
 
 
