@@ -9,6 +9,10 @@ Rumour detection on **Twitter15** and **Twitter16**, using both **what a tweet s
 
 The headline model, **GE-Stack**, combines three views of every source tweet (its text, the users who spread it, and the timing and shape of its retweet cascade) in a stacked ensemble. On the standard 4-class task it reaches **~92% accuracy**, and it outperforms a fine-tuned DeBERTa-v3 by about 20 points on identical test sets.
 
+**Live demo: [rumour-desk.onrender.com](https://rumour-desk.onrender.com)** (free hosting; the first visit after idle can take up to a minute to wake).
+
+[![Rumour Desk web app](docs/figures/web_app.png)](https://rumour-desk.onrender.com)
+
 ---
 
 ## Results
@@ -157,7 +161,7 @@ Each run writes per-split metrics, 95% confidence intervals, paired significance
 
 ## Web app (backend + frontend)
 
-A FastAPI service serves GE-Stack and a small static frontend (no build step).
+A FastAPI service serves GE-Stack and a small static frontend (no build step). It is deployed on Render at **https://rumour-desk.onrender.com** (see `render.yaml`; models are trained at build time). Paste a tweet for a text-only check, or expand "Add spread data" to add retweeters for the full three-view model.
 
 ```bash
 pip install -r requirements-backend.txt      # light: no torch needed
