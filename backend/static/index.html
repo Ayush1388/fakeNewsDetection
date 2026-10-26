@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rumour Desk</title>
+<meta name="description" content="Check whether a tweet looks like a true, false or unverified rumour, from its text and how it spread.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 fill=%27%23C8401F%27/%3E%3Ctext x=%2716%27 y=%2724%27 font-size=%2724%27 text-anchor=%27middle%27 fill=%27%23fff%27 font-family=%27Georgia%27%3ER%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <nav class="rail" aria-label="Main">
+    <div class="brand"><b>Rumour Desk</b><span>GE-Stack classifier</span></div>
+    <ul class="nav">
+      <li><button data-view="intake" class="navbtn">New check</button></li>
+      <li><button data-view="examples" class="navbtn">Examples</button></li>
+      <li><button data-view="about" class="navbtn">About the model</button></li>
+    </ul>
+  </nav>
+
+  <main id="main" tabindex="-1">
+    <!-- Intake -->
+    <section id="v-intake" class="view">
+      <h1 class="display">What needs checking?</h1>
+      <p class="lede">Paste a tweet. Add who shared it and when to use the full model.</p>
+      <form id="form" novalidate>
+        <label class="field" for="text">Tweet text</label>
+        <textarea id="text" rows="4" maxlength="2000" placeholder="e.g. breaking: parliament hill attacked, soldier shot at national war memorial"></textarea>
+
+        <details class="spread-in">
+          <summary>Add spread data <span class="muted">(optional, improves accuracy)</span></summary>
+          <label class="field" for="prop">One retweeter per line: user id, minutes after the tweet</label>
+          <textarea id="prop" rows="5" class="mono" spellcheck="false" placeholder="39364684, 0&#10;21061006, 0.45&#10;18513522, 0.85"></textarea>
+        </details>
+
+        <div class="actions">
+          <button type="submit" class="btn primary" id="go">Check claim</button>
+          <label class="inline" for="dataset">Trained on
+            <select id="dataset">
+              <option value="twitter15">Twitter15</option>
+              <option value="twitter16">Twitter16</option>
+            </select>
+          </label>
+        </div>
+        <p id="error" class="error" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <!-- Working -->
+    <section id="v-working" class="view" hidden aria-live="polite">
+      <p class="mono muted" id="w-claim"></p>
+      <h2 class="display sm">Reading the claim</h2>
+      <ol class="steps" id="steps">
+        <li data-step="text"><span class="dot"></span><span>Text view<small>Words and character patterns</small></span></li>
+        <li data-step="spreaders"><span class="dot"></span><span>Spreader view<small>Who shared it</small></span></li>
+        <li data-step="cascade"><span class="dot"></span><span>Cascade view<small>How fast and how far it spread</small></span></li>
+        <li data-step="stack"><span class="dot"></span><span>Combine<small>Weigh the views into one ruling</small></span></li>
+      </ol>
+      <p class="muted" id="w-note"></p>
+    </section>
+
+    <!-- Verdict -->
+    <section id="v-verdict" class="view" hidden>
+      <div class="crumbs mono"><button class="btn quiet" id="again">New check</button><span id="v-meta"></span></div>
+      <h2 class="claim" id="v-claim"></h2>
+      <div class="ruling">
+        <div class="stamp" id="stamp" role="img"></div>
+        <div class="score"><b id="v-conf"></b><span class="mono muted">/100</span><small class="mono muted">model confidence</small></div>
+        <p id="v-summary"></p>
+      </div>
+      <div class="cols">
+        <div>
+          <h3 class="label mono">Findings</h3>
+          <div id="findings"></div>
+          <p class="note" id="v-note"></p>
+        </div>
+        <aside>
+          <h3 class="label mono rule">Spread</h3>
+          <div id="spread"></div>
+          <h3 class="label mono rule">Ruling odds</h3>
+          <div id="bars"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Examples -->
+    <section id="v-examples" class="view" hidden>
+      <h1 class="display">Examples</h1>
+      <p class="lede">Tweets from the dataset, with their real spread data. They were in the training set, so results here are optimistic.</p>
+      <div class="actions">
+        <label class="inline" for="ex-dataset">Dataset
+          <select id="ex-dataset"><option value="twitter15">Twitter15</option><option value="twitter16">Twitter16</option></select>
+        </label>
+        <button class="btn" id="shuffle" type="button">Show others</button>
+      </div>
+      <ul class="examples" id="samples"></ul>
+    </section>
+
+    <!-- About -->
+    <section id="v-about" class="view prose" hidden>
+      <h1 class="display">About the model</h1>
+      <p class="lede">GE-Stack looks at three things about a tweet and lets a final model decide how much to trust each.</p>
+      <h3 class="label mono rule">The three views</h3>
+      <dl>
+        <dt>Text</dt><dd>The wording of the tweet.</dd>
+        <dt>Spreaders</dt><dd>Which accounts retweeted or replied to it.</dd>
+        <dt>Cascade</dt><dd>How big the spread was and how quickly it happened.</dd>
+      </dl>
+      <h3 class="label mono rule">What it can and cannot tell you</h3>
+      <p>It sorts a tweet into one of four categories: not a rumour, true, false or unverified. It learned this from about a thousand labelled tweets per dataset. It does not look up sources or check facts.</p>
+      <p>On tweets about stories it had seen, accuracy is about 92%. On stories it had never seen, it falls to roughly 70 to 86% depending on how strictly stories are separated, and to about 57 to 65% when predicting newer tweets from older ones. Treat a ruling as a lead to follow up, not as proof.</p>
+      <p>Without spread data, only the text view is used, which is less accurate.</p>
+    </section>
+
+    <!-- Model results (always at the bottom) -->
+    <section id="results" aria-labelledby="res-h">
+      <h2 id="res-h" class="display sm">How the model performs</h2>
+      <p class="lede" id="res-lede">Results from the experiments in this repository.</p>
+      <div class="tabs" role="tablist" aria-label="Dataset" id="res-tabs"></div>
+      <div id="res-body"><p class="muted">Loading results…</p></div>
+    </section>
+  </main>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
